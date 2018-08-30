@@ -1,0 +1,29 @@
+@import "variable.styl"
+
+body, html
+  line-height: 1
+  font-family: 'PingFang SC', 'STHeitiSC-Light', 'Helvetica-Light', arial, sans-serif, 'Droid Sans Fallback'
+  user-select: none
+  -webkit-tap-highlight-color: transparent
+  color: $color-text
+
+html
+  -webkit-text-size-adjust none
+
+label, button
+  cursor: pointer
+
+.book
+  display flex
+  cursor pointer
+  justify-content center
+  align-items center
+  margin px2rem(35)
+  padding px2rem(30) 0
+  background linear-gradient(90deg, #00C5FF 0%, #0298FF 100%)
+  color $color-background
+  border-radius px2rem(100)
+  position fixed 
+  bottom px2rem(40)
+  width 91%
+  box-sizing border-box

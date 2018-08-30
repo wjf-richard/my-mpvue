@@ -1,0 +1,47 @@
+{
+  "pages": [
+    "pages/memberMsg/main",
+    "pages/index/main",
+    "pages/user/main",
+    "pages/course/main",
+    "pages/instructor/main",
+    "pages/courseDetail/main",
+    "pages/instructorDetail/main"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F7F7F7",
+    "navigationBarTitleText": "SIX PACK CLUB",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#808080",
+    "selectedColor": "#4DBBFD",
+    "list": [
+      {
+        "pagePath": "pages/index/main",
+        "text": "首页",
+        "iconPath": "common/images/home.png",
+        "selectedIconPath": "common/images/home@2x.png"
+      },
+      {
+        "pagePath": "pages/instructor/main",
+        "text": "教练介绍",
+        "iconPath": "common/images/coach.png",
+        "selectedIconPath": "common/images/coach@2x.png"
+      },
+      {
+        "pagePath": "pages/course/main",
+        "text": "课程预约",
+        "iconPath": "common/images/class.png",
+        "selectedIconPath": "common/images/class@2x.png"
+      },
+      {
+        "pagePath": "pages/user/main",
+        "text": "个人",
+        "iconPath": "common/images/vip.png",
+        "selectedIconPath": "common/images/vip@2x.png"
+      }
+    ]
+  }
+}
