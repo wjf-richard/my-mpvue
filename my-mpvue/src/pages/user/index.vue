@@ -1,15 +1,22 @@
 <template>
   <div class="container ">
-    <div class="notLogin">
+    <div class="notLogin" v-if="isNotLogin">
       <h1>您好，请先登录</h1>
       <div class="bg-btn">
         <div class="login-btn" @click="toMemberMsg()">
           成为会员
         </div>
       </div>
-      
     </div>
-    <div class="vip-detail-list">
+    <div class="logined" v-if="isLogin">
+      <h1>Hi，请先登录</h1>
+      <div class="bg-btn">
+        <div class="vip-num">
+          3939392
+        </div>
+      </div>
+    </div>
+    <div class="vip-detail-list"  v-if="isLogin">
       <div class="detail-item">
         <div class="type">
           <span class="icon">
@@ -36,21 +43,63 @@
 </template>
 
 <script>
+import {ERR_OK} from '@/http/config'
+import {getMemberOpenId} from '@/http/member'
 export default {
+  data () {
+    return {
+      isNotLogin: '',
+      isLogin: '',
+      openId: '',
+      member: []
+    }
+  },
+  beforeMount () {
+    this._getMemberOpenId()
+  },
+  mounted () {
+    this.getWxLoginResult()
+  },
   methods: {
     toMemberMsg () {
-      const url = '/pages/memberMsg/main'
+      const url = '/pages/memberMsg/main?openId=' + this.openId
       wx.navigateTo({ url })
     },
-    getWxLoginResult (cb) {
+    getWxLoginResult () {
       console.log('getWxLoginResult..')
+      let _this = this
       wx.login({
         success (loginResult) {
+          var code = loginResult.code
+          // console.log(code)
+          wx.request({
+            url: 'https://api.gcms.mygear.cn/wechat_login/get_session_info?code=' + code,
+            data: {},
+            header: {
+              'content-type': 'json'
+            },
+            success: function (res) {
+              _this.openId = res.data.data.openid // 返回openid
+              console.log('user', _this.openId)
+            }
+          })
           console.log('wx.login code..' + loginResult.code)
-          this.toMemberMsg()
         },
         fail (loginError) {
-          cb(new Error('微信登录失败，请检查网络状态'), null)
+          console.log('微信登录失败，请检查网络状态')
+        }
+      })
+    },
+    _getMemberOpenId () {
+      getMemberOpenId().then((res) => {
+        console.log('获取openID', res)
+        if (res.code === ERR_OK) {
+          console.log('返回的值', res.data)
+          this.isLogin = true
+          this.isNotLogin = false
+        } else {
+          this.isLogin = false
+          this.isNotLogin = true
         }
       })
     }
@@ -94,6 +143,33 @@ export default {
           align-items center
           background $color-background
           border-radius px2rem(50)
+    .logined
+      h1
+        margin px2rem(40) px2rem(60)
+        font-weight 900
+        font-size $font-size-large-x
+      .bg-btn
+        position relative
+        height px2rem(350)
+        width 84%
+        box-sizing border-box
+        margin 0 px2rem(8%)
+        overflow hidden
+        background url(http://pdwhalwaj.bkt.clouddn.com/vip_cover.png) no-repeat
+        background-size 100% 100%
+        border-radius px2rem(20)
+        box-shadow 0 10px 20px 0 rgba(0,0,0,0.15),
+        0 4px 10px 0 rgba(0,0,0,0.15)
+        display flex
+        justify-content center
+        align-items center
+        .vip-num
+          font-size $font-size-medium-x
+          color $color-background
+          position absolute
+          bottom px2rem(26)
+          left px2rem(40)
+
     .vip-detail-list
       margin px2rem(80) px2rem(60) px2rem(60) px2rem(60)
       .detail-item

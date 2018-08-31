@@ -1,9 +1,9 @@
 {
   "pages": [
-    "pages/memberMsg/main",
-    "pages/index/main",
     "pages/user/main",
+    "pages/index/main",
     "pages/course/main",
+    "pages/memberMsg/main",
     "pages/instructor/main",
     "pages/courseDetail/main",
     "pages/instructorDetail/main"

@@ -127,7 +127,7 @@ export default {
       getHotCourses().then((res) => {
         if (res.data.code === ERR_OK) {
           this.hotCourses = res.data.data
-          // console.log(this.hotCourses)
+          console.log(this.hotCourses)
         }
       }, (err) => { console.log(err) }
       )
