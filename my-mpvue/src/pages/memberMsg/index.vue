@@ -60,37 +60,42 @@
       <div class="cell_hb optional">选填</div>
     </div>
     <div class="book pay">
-      <div class="left"><span>￥2888</span>&nbsp/&nbsp年</div>
+      <div class="left"><span>￥<span>{{memberPrice}}</span></span>&nbsp/&nbsp年</div>
       <div class="right" @click="goToPay">去支付</div>
     </div>
   </div>
 </template>
 
 <script>
-// import {ERR_OK} from '@/http/config'
+import {ERR_OK} from '@/http/config'
 import {getCourseList} from '@/http/member'
+import {payMent} from '@/http/pay'
+import {getOnly} from '@/http/setting'
 export default {
   data () {
     return {
       items: [
-        {name: 'man', value: '先生', checked: true},
-        {name: 'lady', value: '女士'}
+        {name: '男', value: '先生', checked: true},
+        {name: '女', value: '女士'}
       ],
       member: {
         name: '',
         email: '',
-        gender: 'man',
+        gender: '男',
         telephone: '',
         birthday: ''
       },
-      pickerEnd: ''
+      pickerEnd: '',
+      memberPrice: ''
     }
   },
   mounted () {
     // 设置时间
     let today = this.getToday()
     this.pickerEnd = today
-    console.log(this.openId)
+    // 获取会员费用
+    this._getOnly()
+    // 获取openID
     this.member.openId = this.openId
   },
   onLoad (options) {
@@ -111,6 +116,11 @@ export default {
       let today = myDate.getFullYear() + '-' + myMonth + '-' + mydate
       return today
     },
+    _getOnly () {
+      getOnly().then((res) => {
+        this.memberPrice = res.data.data.memberPrice
+      })
+    },
     telephoneChange (e) {
       this.member.telephone = e.target.value
       console.log(this.member.telephone)
@@ -127,6 +137,38 @@ export default {
       console.log(this.member)
       getCourseList(this.member).then((res) => {
         console.log(res)
+        if (res.data.data.openId) {
+          payMent(res.data.data.openId).then((res) => {
+            console.log(res)
+            if (res.data.code === ERR_OK) {
+              wx.requestPayment({
+                timeStamp: res.data.data.timeStamp,
+                nonceStr: res.data.data.nonceStr,
+                package: res.data.data.package,
+                signType: res.data.data.signType,
+                paySign: res.data.data.paySign,
+                success: function (res) {
+                  console.log('成功后的', res)
+                  wx.showToast({
+                    title: '支付成功',
+                    success: function () {
+                      console.log('准备跳转')
+                      wx.switchTab({
+                        url: '/pages/user/main'
+                      })
+                    }
+                  })
+                },
+                fail: function (res) {
+                  console.log('失败后的', res)
+                  // wx.showToast({titlt: '支付失败' + res})
+                }
+              })
+            } else {
+              wx.showToast({title: '服务器忙' + res.data.code + res.data.msg})
+            }
+          })
+        }
       })
     }
   }

@@ -3,7 +3,7 @@ import fly from './api'
 
 // 获取openid会员
 export function getMemberOpenId (openId) {
-  const url = '/members/open_id?openId=' + 'openId'
+  const url = '/members/open_id?openId=' + openId
   return fly.get(
     url,
     null,

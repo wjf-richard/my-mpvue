@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/user/main",
     "pages/index/main",
+    "pages/user/main",
     "pages/course/main",
     "pages/memberMsg/main",
     "pages/instructor/main",

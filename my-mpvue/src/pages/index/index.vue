@@ -9,10 +9,10 @@
         duration="1000"
         indicator-color="#ffffff"
         indicator-active-color="#0298FF">
-        <block v-for="(item, index) in imgUrls" :index="index" :key="key">
+        <block v-for="(item, index) in imgLists" :index="index" :key="key">
           <swiper-item>
             <a>
-              <image :src="item" class="slide-image" mode="aspectFill"/>
+              <image :src="item.image" class="slide-image" mode="aspectFill"/>
             </a>
           </swiper-item>
         </block>
@@ -40,7 +40,7 @@
         </a> -->
       </div>
       <scroll-view scroll-x class="coach-scroll" >
-        <view @click="toPopularity()" class="scroll-view-item" v-for="(item, index) in popularityInstructors" :key="item.id">
+        <view @click="toPopularity(item.id)" class="scroll-view-item" v-for="(item, index) in popularityInstructors" :key="item.id">
           <div class="item">
             <img class="coach-heads" :src=" item.avatarUrl " alt="">
             <span class="coach-name">{{ item.name }}</span>
@@ -88,30 +88,33 @@
 import {ERR_OK} from '@/http/config'
 import {getPopularityInstructors} from '@/http/instructors'
 import {getHotCourses} from '@/http/course'
+import {getOnly} from '@/http/setting'
 export default {
   data () {
     return {
-      imgUrls: [
-        'http://y.gtimg.cn/music/common/upload/MUSIC_FOCUS/320017.jpg',
-        'http://y.gtimg.cn/music/common/upload/MUSIC_FOCUS/318218.jpg',
-        'http://y.gtimg.cn/music/common/upload/MUSIC_FOCUS/319680.jpg',
-        'http://y.gtimg.cn/music/common/upload/MUSIC_FOCUS/319161.jpg'
-      ],
+      imgLists: [],
       popularityInstructors: [],
       hotCourses: []
     }
   },
   onLoad () {
+    this.getSlidersBar()
     this._getPopularityInstructors()
     this._getHotCourses()
   },
   methods: {
+    getSlidersBar () {
+      getOnly().then((res) => {
+        // console.log(res)
+        this.imgLists = res.data.data.indexAdvertisement
+      })
+    },
     toHotCourse () {
       const url = '/pages/courseDetail/main'
       wx.navigateTo({ url })
     },
-    toPopularity () {
-      const url = '/pages/instructorDetail/main'
+    toPopularity (id) {
+      const url = '/pages/instructorDetail/main?id=' + id
       wx.navigateTo({ url })
     },
     _getPopularityInstructors () {
@@ -127,7 +130,7 @@ export default {
       getHotCourses().then((res) => {
         if (res.data.code === ERR_OK) {
           this.hotCourses = res.data.data
-          console.log(this.hotCourses)
+          // console.log(this.hotCourses)
         }
       }, (err) => { console.log(err) }
       )

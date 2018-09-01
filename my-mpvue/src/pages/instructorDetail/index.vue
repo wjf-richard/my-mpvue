@@ -28,9 +28,23 @@
 </template>
 
 <script>
+// import {ERR_OK} from '@/http/config'
+import {getPopularityInstructors} from '@/http/instructors'
 import tab from '@/components/tab'
 
 export default {
+  data () {
+    return {
+      instructorDetail: []
+    }
+  },
+  methods: {
+    _getPopularityInstructors () {
+      getPopularityInstructors().then((res) => {
+        console.log(res)
+      })
+    }
+  },
   components: {
     tab
   }
