@@ -11,6 +11,16 @@ export function getInstructorsList () {
   )
 }
 
+// 根据id获取教练详情
+export function getInstructorsDetail (instructorId) {
+  const url = '/instructors/' + instructorId + '/instructor_details'
+  return fly.get(
+    url,
+    null,
+    {method: 'get'}
+  )
+}
+
 // 获取人气教练
 export function getPopularityInstructors () {
   const url = '/instructors/recommended'

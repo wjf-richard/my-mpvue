@@ -5,7 +5,7 @@ var fly = new Fly()
 
 // 配置请求基地址
 // 定义公共headers
-fly.config.headers = { xx: 5, bb: 6, dd: 7 }
+// fly.config.headers = { xx: 5, bb: 6, dd: 7 }
 // 设置超时
 fly.config.timeout = 10000
 // 设置请求基地址
