@@ -1,23 +1,21 @@
 <template>
   <div class="container ">
-    <div class="instructor-base-msg">
+    <div class="instructor-base-msg" >
       <div class="head">
         <div class="left">
           <div class="instructor-name-flag">
-            <p class="name">刘美佳</p>
-            <span class="flag">最强臀部</span>
-            <span class="flag">马甲线</span>
+            <p class="name">{{instructorDetail.instructor.name}}</p>
+            <span class="flag" v-for="(item, index) in instructorDetail.instructor.specialities" :key="index">{{item}}</span>
           </div>
-          <div class="self-introduction">从青葱到成熟，她的生命里一直有健身陪伴，每年定期外出随大师学习，不断自我成长。</div>
+          <div class="self-introduction">{{instructorDetail.instructor.brief}}</div>
           <div class="type">
-            <span class="type-item">塑性</span>
-            <span class="type-item">减脂</span>
-            <span class="type-item">塑臀</span>
+            <span class="type-item"v-for="(tagsItem, index) in instructorDetail.instructor.tags" :key="index">{{tagsItem}}</span>
+            
           </div>
-          <div class="cost"><span>300</span>元 / 小时</div>
+          <!-- <div class="cost"><span>300</span>元 / 小时</div> -->
         </div>
         <div class="right">
-          <img class="instructor-heads" src="http://tc.sinaimg.cn/maxwidth.800/tc.service.weibo.com/img_mp_itc_cn/6c04a51f6d7f9fb62f288c74bd959a75.jpg" alt="">          
+          <img class="instructor-heads" :src="instructorDetail.instructor.avatarUrl" alt="">
         </div>
       </div>
       
@@ -29,19 +27,36 @@
 
 <script>
 // import {ERR_OK} from '@/http/config'
-import {getPopularityInstructors} from '@/http/instructors'
+import {getPopularityInstructors, getInstructorsDetail} from '@/http/instructors'
 import tab from '@/components/tab'
 
 export default {
   data () {
     return {
-      instructorDetail: []
+      instructorDetail: {
+        instructor: []
+      }
     }
+  },
+  mounted () {
+    // 获取openID
+    this.instructorDetail.instructorId = this.instructorId
+    this._getInstructorsDetail(this.instructorDetail.instructorId)
+  },
+  onLoad (options) {
+    this.instructorId = options.instructorId
+    console.log('instructorid', this.instructorId)
   },
   methods: {
     _getPopularityInstructors () {
       getPopularityInstructors().then((res) => {
         console.log(res)
+      })
+    },
+    _getInstructorsDetail (instructorId) {
+      getInstructorsDetail(instructorId).then((res) => {
+        console.log(res)
+        this.instructorDetail.instructor = res.data.data.instructor
       })
     }
   },

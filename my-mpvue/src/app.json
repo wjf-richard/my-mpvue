@@ -1,17 +1,17 @@
 {
   "pages": [
     "pages/index/main",
+    "pages/tab/main",
     "pages/user/main",
-    "pages/course/main",
+    "pages/signIn/main",
     "pages/memberMsg/main",
-    "pages/instructor/main",
     "pages/courseDetail/main",
     "pages/instructorDetail/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#F7F7F7",
-    "navigationBarTitleText": "SIX PACK CLUB",
+    "navigationBarTitleText": "铂仕健身俱乐部",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
@@ -19,26 +19,20 @@
     "selectedColor": "#4DBBFD",
     "list": [
       {
-        "pagePath": "pages/index/main",
+        "pagePath": "pages/index/main", 
         "text": "首页",
         "iconPath": "common/images/home.png",
         "selectedIconPath": "common/images/home@2x.png"
       },
       {
-        "pagePath": "pages/instructor/main",
-        "text": "教练介绍",
-        "iconPath": "common/images/coach.png",
-        "selectedIconPath": "common/images/coach@2x.png"
-      },
-      {
-        "pagePath": "pages/course/main",
-        "text": "课程预约",
-        "iconPath": "common/images/class.png",
-        "selectedIconPath": "common/images/class@2x.png"
+        "pagePath": "pages/tab/main",
+        "text": "资讯",
+        "iconPath": "common/images/infor.png",
+        "selectedIconPath": "common/images/infor_click.png"
       },
       {
         "pagePath": "pages/user/main",
-        "text": "个人",
+        "text": "会员",
         "iconPath": "common/images/vip.png",
         "selectedIconPath": "common/images/vip@2x.png"
       }

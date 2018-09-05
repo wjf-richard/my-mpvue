@@ -20,29 +20,38 @@
       <div class="detail-item">
         <div class="type">
           <span class="icon">
+            <img src="http://pdwhalwaj.bkt.clouddn.com/sign.png" alt="">
+          </span>
+          <span class="title">我的签到</span>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="type">
+          <span class="icon">
             <img src="http://pdwhalwaj.bkt.clouddn.com/vip_integral.png" alt="">
           </span>
           <span class="title">我的积分</span>
         </div>
-        <div class="content"><span class="integral">139</span>分</div>
+        <div class="content"><span class="integral">139</span></div>
       </div>
       <div class="detail-item">
         <div class="type">
           <span class="icon">
             <img src="http://pdwhalwaj.bkt.clouddn.com/vip_coach.png" alt="">
           </span>
-          <span class="title">我的教练</span>
+          <span class="title">我的私教</span>
         </div>
-        <div class="content"><span class="num">139</span></div>
+        <div class="content"><span class="num"></span></div>
       </div>
     </div>
-    <!-- <div class="login">
-
-    </div> -->
+   <div class="loading-container" v-if="isData">
+      <loading></loading>
+    </div>
   </div>
 </template>
 
 <script>
+import Loading from 'base/loading/loading'
 import {ERR_OK} from '@/http/config'
 import {getMemberOpenId} from '@/http/member'
 export default {
@@ -50,11 +59,15 @@ export default {
     return {
       isNotLogin: '',
       isLogin: '',
+      isData: true,
       openId: '',
       member: {
         name: ''
       }
     }
+  },
+  components: {
+    Loading
   },
   onShow () {
     // 跳转过来后没使用 onShow() 重新刷新页面
@@ -114,15 +127,18 @@ export default {
             this.isNotLogin = false
             this.member.name = res.data.data.name
             console.log('已经登录')
+            this.isData = false
           } else {
             console.log('有openid,但是为支付')
             this.isLogin = false
             this.isNotLogin = true
+            this.isData = false
           }
         } else {
           console.log('没有登录')
           this.isLogin = false
           this.isNotLogin = true
+          this.isData = false
         }
       })
     }
@@ -181,8 +197,8 @@ export default {
         background url(http://pdwhalwaj.bkt.clouddn.com/vip_cover.png) no-repeat
         background-size 100% 100%
         border-radius px2rem(20)
-        box-shadow 0 10px 20px 0 rgba(0,0,0,0.15),
-        0 4px 10px 0 rgba(0,0,0,0.15)
+        box-shadow 0 10px 20px 0 rgba(3,90,255,0.15),
+        0 4px 10px 0 rgba(3,90,255,0.15)
         display flex
         justify-content center
         align-items center

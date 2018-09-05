@@ -4,27 +4,68 @@
       <div class="main">
         <div class="couser-des">
           <div class="tag">高贵</div>
-          <div class="course-name">芭蕾舞</div>
+          <div class="course-name">{{courseDetail.name}}</div>
         </div>
-        <div class="course-photos">
-          <img src="http://pdwhalwaj.bkt.clouddn.com/Bitmap.png" alt="">
-          <img src="http://pdwhalwaj.bkt.clouddn.com/Bitmap1.png" alt="">
-          <img src="http://pdwhalwaj.bkt.clouddn.com/Bitmap2.png" alt="">
+        <div class="course-photos" >
+          <img v-for="(item, index) in imageUrls" :key="index" :src="item" alt="">
         </div>
       </div>
       
     </div>
 
-    <tab></tab>
+    <tab :tabBar="tabBar" :tabContent="tabContent"></tab>
     
     <!-- <div class="book">预定课程</div> -->
   </div>
 </template>
 
 <script>
+import {getCourseDetail} from '@/http/course'
 import tab from '@/components/tab'
 
 export default {
+  data () {
+    return {
+      courseDetail: [],
+      imageUrls: []
+      // tabBar: [
+      //   { 'title': '课程介绍' },
+      //   { 'title': '训练效果' },
+      //   { 'title': '时22间' }
+      // ],
+      // tabContent: [
+      //   { 'content': '健身教练，分为团体操课程教练和私人教练，组织健身者做计划中的健身运动或健身操。健身教练是指在健身俱乐部中指导会员进行训练的工作人员，其作具有互动性、针对性等特点，并且是按小时收费的。',
+      //     'isTime': true,
+      //     'week': '星期二',
+      //     'time': '19:00 -20:00'
+      //   },
+      //   { 'content': '平板支撑（plank）是一种类似于俯卧撑的肌肉训练方法，在锻炼时主要呈俯卧姿势，可以有效的锻炼腹横肌，被公认为训练核心肌群的有效方法。',
+      //     'isTime': false
+      //   },
+      //   { 'content': '时间时间',
+      //     'isTime': false
+      //   }
+      // ]
+    }
+  },
+  mounted () {
+    // 获取courseId
+    this.courseDetail.courseId = this.courseId
+    this._getCourseDetail(this.courseDetail.courseId)
+  },
+  onLoad (options) {
+    this.courseId = options.courseId
+    console.log('courseId', this.courseId)
+  },
+  methods: {
+    _getCourseDetail (courseId) {
+      getCourseDetail(courseId).then((res) => {
+        this.courseDetail = res.data.data.course
+        this.imageUrls = res.data.data.imageUrls
+        console.log(res)
+      })
+    }
+  },
   components: {
     tab
   }

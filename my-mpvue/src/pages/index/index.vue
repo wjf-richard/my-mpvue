@@ -21,11 +21,10 @@
     <div class="hot-course">
       <div class="title">
         <h3>热门课程</h3>
-        <!-- <a class="toMore" href="/pages/coach/main"><span class="more">more</span><i class="iconfont icon-right"></i>
-        </a> -->
+        
       </div>
       <scroll-view scroll-x class="course-scroll" >
-        <view  class="scroll-view-item" v-for="(item, index) in hotCourses" :key="item.id" @click="toHotCourse()">
+        <view  class="scroll-view-item" v-for="(item, index) in hotCourses" :key="item.id" @click="toHotCourse(item.id)">
           <div class="item">
             <img :src="item.cover" alt="">
             <span class="item-title">{{ item.name }}</span>
@@ -36,16 +35,14 @@
     <div class="hot-coach">
       <div class="title">
         <h3>人气教练</h3>
-        <!-- <a class="toMore"><span class="more">more</span><i class="iconfont icon-right"></i>
-        </a> -->
       </div>
       <scroll-view scroll-x class="coach-scroll" >
-        <view @click="toPopularity(item.id)" class="scroll-view-item" v-for="(item, index) in popularityInstructors" :key="item.id">
+        <view @click="toPopularityInstructor(item.id)" class="scroll-view-item" v-for="(item, index) in popularityInstructors" :key="item.id">
           <div class="item">
             <img class="coach-heads" :src=" item.avatarUrl " alt="">
             <span class="coach-name">{{ item.name }}</span>
             <p class="job-name">{{ item.profession }}</p>
-            <a class="book-btn"  @click="toPopularity()">预约</a>
+            <a class="book-btn"  @click="toPopularityInstructor(item.id)">预约</a>
           </div>
         </view>
       </scroll-view>
@@ -81,6 +78,7 @@
         </div>
       </div>
     </div>
+    
   </div>
 </template>
 
@@ -105,29 +103,32 @@ export default {
   methods: {
     getSlidersBar () {
       getOnly().then((res) => {
-        // console.log(res)
+        // console.log('轮播', res)
         this.imgLists = res.data.data.indexAdvertisement
       })
     },
-    toHotCourse () {
-      const url = '/pages/courseDetail/main'
+    toHotCourse (courseId) {
+      const url = '/pages/courseDetail/main?courseId=' + courseId
+      console.log('热门课程', courseId)
       wx.navigateTo({ url })
     },
-    toPopularity (id) {
-      const url = '/pages/instructorDetail/main?id=' + id
+    toPopularityInstructor (instructorId) {
+      const url = '/pages/instructorDetail/main?instructorId=' + instructorId
+      // console.log('热门教练', instructorId)
       wx.navigateTo({ url })
     },
     _getPopularityInstructors () {
       getPopularityInstructors().then((res) => {
         if (res.data.code === ERR_OK) {
           this.popularityInstructors = res.data.data
-          // console.log(this.popularityInstructors)
+          // console.log(this.popularityInstructors[0].id)
         }
       }, (err) => { console.log(err) }
       )
     },
     _getHotCourses () {
       getHotCourses().then((res) => {
+        // console.log(res)
         if (res.data.code === ERR_OK) {
           this.hotCourses = res.data.data
           // console.log(this.hotCourses)
@@ -154,6 +155,7 @@ export default {
         0 4px 10px 0 rgba(0,0,0,0.15)
       .swiper
         border-radius 10px
+        height px2rem(250)
         swiper-item
           border-radius 10px
           a
@@ -170,14 +172,6 @@ export default {
         margin px2rem(40) px2rem(40)
       h3
         font-weight bold
-      .toMore
-        font-size px2rem(30)
-        display flex
-        justify-content flex-end
-        align-items center
-        vertical-align middle
-        .more
-          margin-bottom px2rem(6)
     .course-scroll
       //width: 1000rpx;  //注意：不能加宽度！！！否则会失效
       display: flex;
@@ -313,5 +307,9 @@ export default {
             border-radius px2rem(100)
             line-height px2rem(50)
             font-size $font-size-medium
+    .loading-container
+      position: absolute
+      width: 100%
+      top: 50%
+      transform: translateY(-50%)
 </style>
-

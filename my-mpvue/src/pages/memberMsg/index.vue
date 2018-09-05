@@ -139,14 +139,14 @@ export default {
         console.log(res)
         if (res.data.data.openId) {
           payMent(res.data.data.openId).then((res) => {
-            console.log(res)
+            console.log('请求回来的', res)
             if (res.data.code === ERR_OK) {
               wx.requestPayment({
-                timeStamp: res.data.data.timeStamp,
-                nonceStr: res.data.data.nonceStr,
-                package: res.data.data.package,
-                signType: res.data.data.signType,
-                paySign: res.data.data.paySign,
+                timeStamp: res.data.data.WxPayMpOrderResult.timeStamp,
+                nonceStr: res.data.data.WxPayMpOrderResult.nonceStr,
+                package: res.data.data.WxPayMpOrderResult.package,
+                signType: res.data.data.WxPayMpOrderResult.signType,
+                paySign: res.data.data.WxPayMpOrderResult.paySign,
                 success: function (res) {
                   console.log('成功后的', res)
                   wx.showToast({

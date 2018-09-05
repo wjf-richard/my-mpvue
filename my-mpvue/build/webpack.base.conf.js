@@ -46,7 +46,8 @@ module.exports = {
       '@': resolve('src'),
       'pages': resolve('src/pages'),
       'common': resolve('src/common'),
-      'stores': resolve('src/stores')
+      'stores': resolve('src/stores'),
+      'base': resolve('src/base')
     },
     symlinks: false,
     aliasFields: ['mpvue', 'weapp', 'browser'],
