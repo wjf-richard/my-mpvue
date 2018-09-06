@@ -1,13 +1,5 @@
 <template>
   <div class="container ">
-    <!-- <div class="tab">
-      <a class="tab-item" href="/pages/instructor/main">
-        <span class="tab-link">教练</span>
-      </a>
-      <a  class="tab-item" href="/pages/course/main">
-        <span class="tab-link">课程</span>
-      </a>
-    </div> -->
     <div class="slider-wrapper">
       <swiper class="swiper" 
         indicator-dots="true"
@@ -21,14 +13,14 @@
         <block v-for="(item, index) in imgUrls" :index="index" :key="key">
           <swiper-item>
             <a>
-              <image :src="item" class="slide-image" mode="aspectFill"/>
+              <image :src="item.image" class="slide-image" mode="aspectFill"/>
             </a>
           </swiper-item>
         </block>
       </swiper>
     </div>
     <div class="course-list">
-      <div class="course-item" v-for="(item, index) in courseList" :key="item.id" @click="toHotCourse()">
+      <div class="course-item" v-for="(item, index) in courseList" :key="item.id" @click="toHotCourse(item.id)">
         <!-- <div class="left">
           <img class="course-heads" :src="item.cover" alt="">
         </div> -->
@@ -55,25 +47,30 @@
 
 <script>
 import {ERR_OK} from '@/http/config'
+import {getOnly} from '@/http/setting'
 import {getCourseList} from '@/http/course'
 export default {
   data () {
     return {
-      imgUrls: [
-        'http://pdwhalwaj.bkt.clouddn.com/timg-8.png',
-        'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535191181542&di=3eaa706d3f575f8dbd27209193ec73c9&imgtype=0&src=http%3A%2F%2Fpic33.photophoto.cn%2F20141127%2F0009021411691874_b.jpg',
-        'http://y.gtimg.cn/music/common/upload/MUSIC_FOCUS/319680.jpg',
-        'http://y.gtimg.cn/music/common/upload/MUSIC_FOCUS/319161.jpg'
-      ],
-      courseList: []
+      imgUrls: [],
+      courseList: [],
+      isLoaded: false
     }
   },
   onLoad () {
+    this._getOnly()
     this._getCourseList()
   },
   methods: {
-    toHotCourse () {
-      const url = '/pages/courseDetail/main'
+    _getOnly () {
+      getOnly().then((res) => {
+        this.imgUrls = res.data.data.instructorAdvertisement
+        console.log('教练轮播', this.imgUrls)
+      })
+    },
+    toHotCourse (courseId) {
+      const url = '/pages/courseDetail/main?courseId=' + courseId
+      console.log('热门课程', courseId)
       wx.navigateTo({ url })
     },
     _getCourseList () {
@@ -82,6 +79,8 @@ export default {
         if (res.data.code === ERR_OK) {
           console.log(res.data.data)
           this.courseList = res.data.data
+          this.isLoaded = true
+          this.$emit('isLoaded', this.isLoaded)
         }
       })
     }

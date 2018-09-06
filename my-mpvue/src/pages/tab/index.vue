@@ -1,35 +1,45 @@
 <template>
   <div class="container">
-    <scroll-view scroll-x class="top">
-      <div class="tabbar" :class="{'tabbar-bottom':currentTab==index}" v-for="(item,index) in tabBar" :key="index" @click="clickTab(index)">
-        {{item.title}}
-        <span :class="{'active-bottom':currentTab==index}" ></span>
-      </div>
-    </scroll-view>
-    <swiper :current="currentTab" @change="changeTab" >
-      <swiper-item class="swiper-item" v-for="(item, index) in tabContent" :key="index" >
-        <div class="content" v-if="index === 0">
-          <scroll-view scroll-y style="height: 92vh" >
-            <instructor></instructor>
-          </scroll-view>
+    <div class="loading-container" v-if="isDataLoaded">
+      <loading></loading>
+    </div>
+    <div v-if="isShow" >
+      <scroll-view scroll-x class="top">
+        <div class="tabbar" :class="{'tabbar-bottom':currentTab==index}" v-for="(item,index) in tabBar" :key="index" @click="clickTab(index)">
+          {{item.title}}
+          <span :class="{'active-bottom':currentTab==index}" ></span>
         </div>
-        <div class="content" v-if="index === 1">
-           <scroll-view scroll-y style="height: 92vh" >
-            <course></course>
-           </scroll-view>
-        </div>
-      </swiper-item>
-      
-    </swiper>
+      </scroll-view>
+      <swiper :current="currentTab" @change="changeTab" >
+        <swiper-item class="swiper-item" v-for="(item, index) in tabContent" :key="index" >
+          <div class="content" v-if="index === 0">
+            <scroll-view scroll-y style="height: 92vh" >
+              <instructor @isLoaded="isInstructorData"></instructor>
+            </scroll-view>
+          </div>
+          <div class="content" v-if="index === 1">
+            <scroll-view scroll-y style="height: 92vh" >
+              <course @isLoaded="isCourseData"></course>
+            </scroll-view>
+          </div>
+        </swiper-item>
+      </swiper>
+
+    </div>
   </div>
 </template>
 
 <script>
+import Loading from 'base/loading/loading'
 import instructor from '@/components/instructor'
 import course from '@/components/course'
 export default {
   data () {
     return {
+      isDataLoaded: true,
+      isShow: false,
+      isInstructorLoaded: false,
+      isCourseLoaded: false,
       tabBar: [
         { 'title': '教练' },
         { 'title': '课程' }
@@ -44,10 +54,28 @@ export default {
     }
   },
   components: {
+    Loading,
     instructor,
     course
   },
+  mounted () {
+    this.isAllDataLoaded()
+  },
   methods: {
+    isAllDataLoaded () {
+      if ((this.isInstructorData) && (this.isCourseData)) {
+        this.isDataLoaded = false
+        this.isShow = true
+      }
+    },
+    isInstructorData (msg) {
+      console.log(msg)
+      this.isInstructorData = msg
+    },
+    isCourseData (msg) {
+      console.log(msg)
+      this.isCourseData = msg
+    },
     clickTab (e) {
       this.currentTab = e
     },

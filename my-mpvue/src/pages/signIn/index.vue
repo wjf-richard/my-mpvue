@@ -57,7 +57,7 @@ export default {
   },
   methods: {
     isLeap () {
-      console.log(this.year)
+      // console.log(this.year)
       const year = this.year
       if (year % 4 === 0 && year % 100 > 0) {
         return true
@@ -113,7 +113,7 @@ export default {
         }
       }
       this.dateArr = arr
-      console.log(this.dateArr)
+      // console.log(this.dateArr)
     },
     nextMonth () {
       if (this.month === 12) {
@@ -134,7 +134,7 @@ export default {
       this.getCalendar()
     },
     contains (arr) {
-      console.log(arr)
+      // console.log(arr)
       if (
         (arr[0] === '') &&
         (arr[1] === '') &&
@@ -146,15 +146,15 @@ export default {
       ) {
         return false
       } else {
-        console.log('是的')
+        // console.log('是的')
         return true
       }
     },
     isCheck (index) {
-      console.log('index', index)
+      // console.log('index', index)
       for (let i in this.checkin) {
         if (index === this.checkin[i]) {
-          console.log('真的')
+          // console.log('真的')
           return true
         }
       }

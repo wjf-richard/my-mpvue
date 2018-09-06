@@ -1,13 +1,5 @@
 <template>
   <div class="container ">
-    <!-- <div class="tab">
-      <a class="tab-item" href="/pages/instructor/main">
-        <span class="tab-link">教练</span>
-      </a>
-      <a  class="tab-item" href="/pages/course/main">
-        <span class="tab-link">课程</span>
-      </a>
-    </div> -->
     <div class="slider-wrapper">
       <swiper class="swiper" 
         indicator-dots="true"
@@ -21,14 +13,14 @@
         <block v-for="(item, index) in imgUrls" :index="index" :key="key">
           <swiper-item>
             <a>
-              <image :src="item" class="slide-image" mode="aspectFill"/>
+              <image :src="item.image" class="slide-image" mode="aspectFill"/>
             </a>
           </swiper-item>
         </block>
       </swiper>
     </div>
     <div class="instructor-list">
-      <div class="instructor-item" v-for="(item, index) in instructors" :key="item.id" @click="toPopularity()">
+      <div class="instructor-item" v-for="(item, index) in instructors" :key="item.id" @click="toInstructorDetail(item.id)">
         <div class="left">
           <img class="instructor-heads" :src="item.avatarUrl" alt="">
         </div>
@@ -46,44 +38,50 @@
           </div>
         </div>
         <div class="right">
-          <a class="book-btn" @click="toPopularity()">预约</a>
+          <a class="book-btn" @click="toInstructorDetail(item.id)">预约</a>
         </div>
       </div>
       
     </div>
-    
   </div>
 </template>
 
 <script>
+import {getOnly} from '@/http/setting'
 import {getInstructorsList} from '@/http/instructors'
 import {ERR_OK} from '@/http/config'
 export default {
   data () {
     return {
-      imgUrls: [
-        'http://pdwhalwaj.bkt.clouddn.com/timg-8.png',
-        'https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1535191181542&di=3eaa706d3f575f8dbd27209193ec73c9&imgtype=0&src=http%3A%2F%2Fpic33.photophoto.cn%2F20141127%2F0009021411691874_b.jpg',
-        'http://y.gtimg.cn/music/common/upload/MUSIC_FOCUS/319680.jpg',
-        'http://y.gtimg.cn/music/common/upload/MUSIC_FOCUS/319161.jpg'
-      ],
-      instructors: []
+      imgUrls: [],
+      instructors: [],
+      isLoaded: false
     }
   },
   onLoad () {
+    this._getOnly()
     this._getInstructorsList()
   },
   methods: {
-    toPopularity () {
-      const url = '/pages/instructorDetail/main'
+    _getOnly () {
+      getOnly().then((res) => {
+        this.imgUrls = res.data.data.instructorAdvertisement
+        console.log('教练轮播', this.imgUrls)
+      })
+    },
+    toInstructorDetail (instructorId) {
+      const url = '/pages/instructorDetail/main?instructorId=' + instructorId
+      // console.log('热门教练', instructorId)
       wx.navigateTo({ url })
     },
     _getInstructorsList () {
       getInstructorsList().then((res) => {
         if (res.data.code === ERR_OK) {
           this.instructors = res.data.data
+          this.isLoaded = true
+          this.$emit('isLoaded', this.isLoaded)
         }
-        console.log(res)
+        // console.log(res)
       })
     }
   }

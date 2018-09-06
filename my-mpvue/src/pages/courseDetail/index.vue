@@ -3,7 +3,7 @@
     <div class="course-base-msg">
       <div class="main">
         <div class="couser-des">
-          <div class="tag">高贵</div>
+          <div class="tag">{{courseDetail.subTitle}}</div>
           <div class="course-name">{{courseDetail.name}}</div>
         </div>
         <div class="course-photos" >
@@ -16,16 +16,21 @@
     <tab :tabBar="tabBar" :tabContent="tabContent"></tab>
     
     <!-- <div class="book">预定课程</div> -->
+    <div class="loading-container" v-if="isData">
+      <loading></loading>
+    </div>
   </div>
 </template>
 
 <script>
+import Loading from 'base/loading/loading'
 import {getCourseDetail} from '@/http/course'
 import tab from '@/components/tab'
 
 export default {
   data () {
     return {
+      isData: true,
       courseDetail: [],
       imageUrls: []
       // tabBar: [
@@ -63,10 +68,12 @@ export default {
         this.courseDetail = res.data.data.course
         this.imageUrls = res.data.data.imageUrls
         console.log(res)
+        this.isData = false
       })
     }
   },
   components: {
+    Loading,
     tab
   }
 }

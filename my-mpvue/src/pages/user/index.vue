@@ -20,14 +20,6 @@
       <div class="detail-item">
         <div class="type">
           <span class="icon">
-            <img src="http://pdwhalwaj.bkt.clouddn.com/sign.png" alt="">
-          </span>
-          <span class="title">我的签到</span>
-        </div>
-      </div>
-      <div class="detail-item">
-        <div class="type">
-          <span class="icon">
             <img src="http://pdwhalwaj.bkt.clouddn.com/vip_integral.png" alt="">
           </span>
           <span class="title">我的积分</span>
@@ -43,8 +35,16 @@
         </div>
         <div class="content"><span class="num"></span></div>
       </div>
+      <div class="detail-item">
+        <div class="type">
+          <span class="icon">
+            <img src="http://pdwhalwaj.bkt.clouddn.com/sign.png" alt="">
+          </span>
+          <span class="title">我的签到</span>
+        </div>
+      </div>
     </div>
-   <div class="loading-container" v-if="isData">
+    <div class="loading-container" v-if="isData">
       <loading></loading>
     </div>
   </div>

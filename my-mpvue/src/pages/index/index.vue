@@ -37,12 +37,12 @@
         <h3>人气教练</h3>
       </div>
       <scroll-view scroll-x class="coach-scroll" >
-        <view @click="toPopularityInstructor(item.id)" class="scroll-view-item" v-for="(item, index) in popularityInstructors" :key="item.id">
+        <view @click="toInstructorDetail(item.id)" class="scroll-view-item" v-for="(item, index) in popularityInstructors" :key="item.id">
           <div class="item">
             <img class="coach-heads" :src=" item.avatarUrl " alt="">
             <span class="coach-name">{{ item.name }}</span>
             <p class="job-name">{{ item.profession }}</p>
-            <a class="book-btn"  @click="toPopularityInstructor(item.id)">预约</a>
+            <a class="book-btn"  @click="toInstructorDetail(item.id)">预约</a>
           </div>
         </view>
       </scroll-view>
@@ -112,7 +112,7 @@ export default {
       console.log('热门课程', courseId)
       wx.navigateTo({ url })
     },
-    toPopularityInstructor (instructorId) {
+    toInstructorDetail (instructorId) {
       const url = '/pages/instructorDetail/main?instructorId=' + instructorId
       // console.log('热门教练', instructorId)
       wx.navigateTo({ url })
