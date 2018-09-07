@@ -4,7 +4,7 @@ import fly from './api'
 // 获取教练列表
 export function getInstructorsList () {
   const url = '/instructors'
-  return fly.get(
+  return fly.request(
     url,
     null,
     {method: 'get'}
@@ -14,7 +14,7 @@ export function getInstructorsList () {
 // 根据id获取教练详情
 export function getInstructorsDetail (instructorId) {
   const url = '/instructors/' + instructorId + '/instructor_details'
-  return fly.get(
+  return fly.request(
     url,
     null,
     {method: 'get'}
@@ -24,7 +24,7 @@ export function getInstructorsDetail (instructorId) {
 // 获取人气教练
 export function getPopularityInstructors () {
   const url = '/instructors/recommended'
-  return fly.get(
+  return fly.request(
     url,
     null,
     {method: 'get'}
