@@ -1,10 +1,11 @@
 {
   "pages": [
+    "pages/user/main",
     "pages/index/main",
     "pages/tab/main",
-    "pages/user/main",
     "pages/signIn/main",
     "pages/memberMsg/main",
+    "pages/updataMemberMsg/main",
     "pages/courseDetail/main",
     "pages/instructorDetail/main"
   ],
