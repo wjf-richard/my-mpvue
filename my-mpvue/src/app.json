@@ -1,10 +1,14 @@
 {
   "pages": [
-    "pages/user/main",
     "pages/index/main",
     "pages/tab/main",
-    "pages/signIn/main",
+    "pages/bookInstructor/main",
+    "pages/articleDetail/main",
+    "pages/selectCourses/main",
+    "pages/pay/main",
     "pages/memberMsg/main",
+    "pages/signIn/main",
+    "pages/user/main",
     "pages/updataMemberMsg/main",
     "pages/courseDetail/main",
     "pages/instructorDetail/main"
@@ -12,7 +16,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#F7F7F7",
-    "navigationBarTitleText": "铂仕健身俱乐部",
+    "navigationBarTitleText": "仕铂健身俱乐部",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {

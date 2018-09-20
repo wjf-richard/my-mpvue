@@ -3,6 +3,9 @@ import App from './App'
 import MpvueRouterPatch from 'mpvue-router-patch'
 import store from './stores'
 import 'common/stylus/index.styl'
+import Tips from './config/tip'
+
+Vue.prototype.$tips = Tips
 
 Vue.prototype.$store = store
 Vue.use(MpvueRouterPatch)

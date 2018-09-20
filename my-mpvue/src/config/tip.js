@@ -2,35 +2,35 @@
  * 提示与加载工具类
  */
 export default class Tips {
-  constructor() {
-    this.isLoading = false;
+  constructor () {
+    this.isLoading = false
   }
   /**
    * 弹出提示框
    */
 
-  static success(title, duration = 500) {
+  static success (title, duration = 600) {
     setTimeout(() => {
       wx.showToast({
         title: title,
-        icon: "success",
+        icon: 'success',
         mask: true,
         duration: duration
-      });
-    }, 300);
+      })
+    }, 300)
     if (duration > 0) {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          resolve();
-        }, duration);
-      });
+          resolve()
+        }, duration)
+      })
     }
   }
 
   /**
    * 弹出确认窗口
    */
-  static confirm(text, payload = {}, title = "提示") {
+  static confirm (text, payload = {}, title = '提示') {
     return new Promise((resolve, reject) => {
       wx.showModal({
         title: title,
@@ -38,76 +38,75 @@ export default class Tips {
         showCancel: true,
         success: res => {
           if (res.confirm) {
-            resolve(payload);
+            resolve(payload)
           } else if (res.cancel) {
-            reject(payload);
+            reject(payload)
           }
         },
         fail: res => {
-          reject(payload);
+          reject(payload)
         }
-      });
-    });
+      })
+    })
   }
 
-  static toast(title, onHide, icon = "success") {
+  static toast (title, onHide, icon = 'success') {
     setTimeout(() => {
       wx.showToast({
         title: title,
         icon: icon,
         mask: true,
         duration: 500
-      });
-    }, 300);
+      })
+    }, 300)
 
     // 隐藏结束回调
     if (onHide) {
       setTimeout(() => {
-        onHide();
-      }, 500);
+        onHide()
+      }, 500)
     }
   }
-
 
   /**
    * 弹出加载提示
    */
-  static loading(title = "加载中") {
+  static loading (title = '加载中') {
     if (Tips.isLoading) {
-      return;
+      return
     }
-    Tips.isLoading = true;
+    Tips.isLoading = true
     wx.showLoading({
       title: title,
       mask: true
-    });
+    })
   }
 
   /**
    * 加载完毕
    */
-  static loaded() {
+  static loaded () {
     if (Tips.isLoading) {
-      Tips.isLoading = false;
-      wx.hideLoading();
+      Tips.isLoading = false
+      wx.hideLoading()
     }
   }
 
-  static share(title, url, desc) {
+  static share (title, url, desc) {
     return {
       title: title,
       path: url,
       desc: desc,
-      success: function(res) {
-        Tips.toast("分享成功");
+      success: function (res) {
+        Tips.toast('分享成功')
       }
-    };
+    }
   }
 
   static alert (text, ok) {
-    if (ok === void 0) { ok = function (res) { }; }
+    if (ok === void 0) { ok = function (res) { } }
     if (!text) {
-      return;
+      return
     }
     wx.showModal({
       content: text,
@@ -115,11 +114,11 @@ export default class Tips {
       confirmColor: '#000000',
       cancelColor: '#000000',
       success: ok
-    });
-  };
+    })
+  }
 }
 
 /**
  * 静态变量，是否加载中
  */
-Tips.isLoading = false;
+Tips.isLoading = false
