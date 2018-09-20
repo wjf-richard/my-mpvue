@@ -9,10 +9,22 @@
       </div>
     </div>
     <div class="logined" v-if="isLogin">
-      <h1>Hi，{{member.name}}</h1>
+      <div class="member-name">
+        <h1>
+          Hi，{{member.name}}
+          <span v-if="member.gender === '男'">先生</span>
+          <span v-else>女士</span>
+        </h1>
+      </div>
       <div class="bg-btn" @click="toUpdataMsg()">
-        <div class="vip-num">
-          3939392
+        <div class="vip-num" v-if="member.cardNo && isActivated">
+          {{ member.cardNo }}
+        </div>
+        <div class="vip-num" v-else-if="!member.cardNo && isActivated">
+            确认中...
+        </div>
+        <div class="not-vip-num" v-else  @click="toPay()">
+          开通VIP会员
         </div>
       </div>
     </div>
@@ -35,7 +47,7 @@
         </div>
         <div class="content"><span class="num"></span></div>
       </div>
-      <div class="detail-item">
+      <div class="detail-item" @click="toSignIn()">
         <div class="type">
           <span class="icon">
             <img src="http://pdwhalwaj.bkt.clouddn.com/sign.png" alt="">
@@ -43,10 +55,10 @@
           <span class="title">我的签到</span>
         </div>
         <div class="content">
-          <span class="num">0</span>
+          <span class="num">&gt;</span>
         </div>
       </div>
-      <div class="signIn">
+      <div class="signIn" @click="_memberSignIn(openId)">
         签到
       </div>
     </div>
@@ -60,17 +72,21 @@
 import Loading from 'base/loading/loading'
 import {ERR_OK} from '@/http/config'
 import {getMemberOpenId, checkMemberIsPay} from '@/http/member'
+import {memberSignIn} from '@/http/signIn'
 export default {
   data () {
     return {
       isNotLogin: '',
       isLogin: '',
       isData: true,
+      isActivated: false,
       openId: '',
       id: '',
       member: {
         name: '',
-        credit: ''
+        credit: '',
+        cardNo: '',
+        gender: ''
       }
     }
   },
@@ -81,7 +97,7 @@ export default {
     // 跳转过来后使用 onShow() 重新刷新页面
     this.getWxLoginResult()
   },
-  onLoad () {
+  created () {
     this.getWxLoginResult()
   },
   methods: {
@@ -92,6 +108,16 @@ export default {
     toUpdataMsg () {
       const url = '/pages/updataMemberMsg/main?id=' + this.id
       wx.navigateTo({ url })
+    },
+    toPay () {
+      const url = '/pages/pay/main?openId=' + this.openId
+      wx.navigateTo({ url })
+    },
+    toSignIn () {
+      setTimeout(() => {
+        const url = '/pages/signIn/main?id=' + this.id
+        wx.navigateTo({ url })
+      }, 500)
     },
     getWxLoginResult () {
       console.log('getWxLoginResult..')
@@ -116,8 +142,8 @@ export default {
                 'content-type': 'json'
               },
               success: function (res) {
-                // console.log('完成后的', res)
-                // console.log('完成后的openID', res.data.data.openid)
+                console.log('完成后的', res)
+                console.log('完成后的openID', res.data.data.openid)
                 if (res.data.data.openid) {
                   _this._checkMemberIsPay(res.data.data.openid)
                 }
@@ -129,27 +155,43 @@ export default {
       })
     },
     _checkMemberIsPay (openId) {
+      console.log(openId)
       checkMemberIsPay(openId).then((res) => {
-        if (res.data.data === false) {
-          this.isLogin = true
-          this.isNotLogin = false
-          this.isData = false
-          this._getMemberOpenId(openId)
-        } else {
+        console.log('checkMemberIsPay', res)
+        if (res.data.code === 40004) {
+          console.log('空值')
           this.isLogin = false
           this.isNotLogin = true
           this.isData = false
+        } else {
+          console.log(res.data.data)
+          console.log('isACTIVEEADTED', res.data.data.isActivated)
+          if (res.data.data.isActivated === true || res.data.data.cardNo) {
+            this.isActivated = res.data.data.isActivated
+            console.log('true')
+            this.isLogin = true
+            this.isNotLogin = false
+            this._getMemberOpenId(openId)
+          } else {
+            this._getMemberOpenId(openId)
+            console.log('false')
+            this.isLogin = true
+          }
         }
+      }).catch((err) => {
+        console.log(err)
       })
     },
     _getMemberOpenId (openId) {
       // console.log(openId)
       getMemberOpenId(openId).then((res) => {
-        // console.log('获取openID', res)
+        console.log('获取openID', res)
         if (res.data.code === ERR_OK) {
           this.id = res.data.data.id
           this.member.name = res.data.data.name
           this.member.credit = res.data.data.credit
+          this.member.cardNo = res.data.data.cardNo
+          this.member.gender = res.data.data.gender
           this.isLogin = true
           this.isNotLogin = false
           console.log('已经登录')
@@ -159,6 +201,19 @@ export default {
           this.isLogin = false
           this.isNotLogin = true
           this.isData = false
+        }
+      }, (err) => {
+        console.log(err)
+      })
+    },
+    _memberSignIn (openId) {
+      memberSignIn(openId).then((res) => {
+        console.log(res)
+        if (res.data.code === ERR_OK) {
+          this.$tips.success('签到成功')
+          this.getWxLoginResult()
+        } else {
+          this.$tips.alert('今天已经签到了，明天继续哦！')
         }
       })
     }
@@ -182,17 +237,21 @@ export default {
         box-sizing border-box
         margin 0 px2rem(8%)
         overflow hidden
-        background url(http://pdwhalwaj.bkt.clouddn.com/vip_copy.png) no-repeat
+        background url(http://pdwhalwaj.bkt.clouddn.com/VIP.png) no-repeat
         background-size 100% 100%
         border-radius px2rem(20)
-        box-shadow 0 10px 20px 0 rgba(0,0,0,0.15),
-        0 4px 10px 0 rgba(0,0,0,0.15)
+        box-shadow 0 10px 20px 0 rgba(22,14,67,0.15),
+        0 4px 10px 0 rgba(22,14,67,0.15)
         display flex
         justify-content center
         align-items center
+        position relative
         .login-btn
+          position absolute
+          bottom px2rem(80)
           cursor pointer
-          color #0F5BFF
+          color $color-background
+          border px2rem(2) solid #fff
           font-weight 900
           font-size $font-size-large-x
           width 60%
@@ -200,13 +259,16 @@ export default {
           display flex
           justify-content center
           align-items center
-          background $color-background
+          background #202132
           border-radius px2rem(50)
     .logined
-      h1
-        margin px2rem(40) px2rem(60)
-        font-weight 900
-        font-size $font-size-large-x
+      .member-name
+        h1
+          margin px2rem(40) px2rem(60)
+          font-weight 900
+          font-size $font-size-large-x
+          span
+            font-size $font-size-medium
       .bg-btn
         cursor pointer
         position relative
@@ -215,11 +277,11 @@ export default {
         box-sizing border-box
         margin 0 px2rem(8%)
         overflow hidden
-        background url(http://pdwhalwaj.bkt.clouddn.com/vip_cover.png) no-repeat
+        background url(http://pdwhalwaj.bkt.clouddn.com/VIP-Copy.png) no-repeat
         background-size 100% 100%
         border-radius px2rem(20)
-        box-shadow 0 10px 20px 0 rgba(3,90,255,0.15),
-        0 4px 10px 0 rgba(3,90,255,0.15)
+        box-shadow 0 10px 20px 0 rgba(22,14,67,0.15),
+        0 4px 10px 0 rgba(22,14,67,0.15)
         display flex
         justify-content center
         align-items center
@@ -229,11 +291,26 @@ export default {
           position absolute
           bottom px2rem(26)
           left px2rem(40)
+        .not-vip-num
+          font-size $font-size-medium
+          color $color-background
+          position absolute
+          bottom px2rem(26)
+          padding 0 px2rem(20)
+          text-align center
+          line-height px2rem(50)
+          height px2rem(50)
+          left px2rem(40)
+          cursor pointer
+          color $color-background
+          border px2rem(2) solid #fff
+          border-radius px2rem(50)
 
     .vip-detail-list
       position relative
       margin px2rem(80) px2rem(60) px2rem(60) px2rem(60)
       .detail-item
+        cursor pointer
         display flex
         justify-content space-between
         align-items center
@@ -255,7 +332,11 @@ export default {
         font-size $font-size-medium-x
         color #FE335C
         .num
-          color #0299FF
+          height px2rem(80)
+          width px2rem(80)
+          img
+            width 100%
+            height 100%
         .back
           width px2rem(20)
           height px2rem(25)

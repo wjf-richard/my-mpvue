@@ -21,7 +21,6 @@
     <div class="hot-course">
       <div class="title">
         <h3>热门课程</h3>
-        
       </div>
       <scroll-view scroll-x class="course-scroll" >
         <view  class="scroll-view-item" v-for="(item, index) in hotCourses" :key="item.id" @click="toHotCourse(item.id)">
@@ -37,12 +36,12 @@
         <h3>人气教练</h3>
       </div>
       <scroll-view scroll-x class="coach-scroll" >
-        <view @click="toInstructorDetail(item.id)" class="scroll-view-item" v-for="(item, index) in popularityInstructors" :key="item.id">
+        <view @click="toInstructorDetail(item.id, openId, id)" class="scroll-view-item" v-for="(item, index) in popularityInstructors" :key="item.id">
           <div class="item">
-            <img class="coach-heads" :src=" item.avatarUrl " alt="">
+            <img class="coach-heads" :src="item.avatarUrl" alt="">
             <span class="coach-name">{{ item.name }}</span>
             <p class="job-name">{{ item.profession }}</p>
-            <a class="book-btn"  @click="toInstructorDetail(item.id)">预约</a>
+            <a class="book-btn"  @click="toInstructorDetail(item.id, openId, id)">预约</a>
           </div>
         </view>
       </scroll-view>
@@ -51,29 +50,14 @@
       <div class="title">
         <h3>教学视频</h3>
       </div>
-      <div class="video-list">
+      <div class="video-list" v-for="(item, index) in articleList" :key="index">
         <div class="video-item">
           <div class="video-header">
-            <img src="http://pdwhalwaj.bkt.clouddn.com/timg-8.png" alt="">
+            <img :src="item.cover" alt="">
           </div>
           <div class="video-main">
-            <p class="video-num">
-              观看人数： <span class="view-num">9876</span>人
-            </p>
-            <span class="video-title">跑步机的正确使用方式</span>
-            <button class="detail-btn">查看详情</button>
-          </div>
-        </div>
-        <div class="video-item">
-          <div class="video-header">
-            <img src="http://pdwhalwaj.bkt.clouddn.com/timg-9.png?imageView2/2/w/200|imageslim" alt="" width="100%">
-          </div>
-          <div class="video-main">
-            <p class="video-num">
-              观看人数： <span class="view-num">9876</span>人
-            </p>
-            <span class="video-title">关于健身中营养餐的比例适配的问题关于健身中营养餐的比例适配的问题关于健身中营养餐的比例适配的问题关于健身中营养餐的比例适配的问题</span>
-            <button class="detail-btn">查看详情</button>
+            <span class="video-title">{{item.title}}</span>
+            <button class="detail-btn" @click="toCheckDetail(item.id)">查看详情</button>
           </div>
         </div>
       </div>
@@ -87,54 +71,108 @@ import {ERR_OK} from '@/http/config'
 import {getPopularityInstructors} from '@/http/instructors'
 import {getHotCourses} from '@/http/course'
 import {getOnly} from '@/http/setting'
+import {getMemberOpenId} from '@/http/member'
+import {getArticleList} from '@/http/articles'
+
 export default {
   data () {
     return {
+      id: '',
+      openId: '',
       imgLists: [],
       popularityInstructors: [],
-      hotCourses: []
+      hotCourses: [],
+      articleList: []
     }
   },
   onLoad () {
     this.getSlidersBar()
     this._getPopularityInstructors()
     this._getHotCourses()
+    this.getWxLoginResult()
+    this._getArticleList()
   },
   methods: {
     getSlidersBar () {
       getOnly().then((res) => {
-        // console.log('轮播', res)
         this.imgLists = res.data.data.indexAdvertisement
       })
     },
     toHotCourse (courseId) {
       const url = '/pages/courseDetail/main?courseId=' + courseId
-      console.log('热门课程', courseId)
       wx.navigateTo({ url })
     },
-    toInstructorDetail (instructorId) {
-      const url = '/pages/instructorDetail/main?instructorId=' + instructorId
-      // console.log('热门教练', instructorId)
+    toCheckDetail (articleId) {
+      const url = '/pages/articleDetail/main?articleId=' + articleId
       wx.navigateTo({ url })
+    },
+    toInstructorDetail (instructorId, openId, id) {
+      const url = '/pages/instructorDetail/main?instructorId=' + instructorId + '&openId=' + openId + '&id=' + id
+      console.log('热门教练', url)
+      wx.navigateTo({ url })
+    },
+    _getArticleList () {
+      getArticleList().then((res) => {
+        if (res.data.code === ERR_OK) {
+          this.articleList = res.data.data
+          console.log(this.articleList)
+        }
+      })
     },
     _getPopularityInstructors () {
       getPopularityInstructors().then((res) => {
         if (res.data.code === ERR_OK) {
           this.popularityInstructors = res.data.data
-          // console.log(this.popularityInstructors[0].id)
         }
       }, (err) => { console.log(err) }
       )
     },
     _getHotCourses () {
       getHotCourses().then((res) => {
-        // console.log(res)
         if (res.data.code === ERR_OK) {
           this.hotCourses = res.data.data
-          // console.log(this.hotCourses)
         }
       }, (err) => { console.log(err) }
       )
+    },
+    getWxLoginResult () {
+      let _this = this
+      wx.login({
+        success (loginResult) {
+          var code = loginResult.code
+          if (code) {
+            console.log('wx.login code..' + loginResult.code)
+          }
+        },
+        fail (loginError) {
+          console.log('微信登录失败，请检查网络状态')
+        },
+        complete (res) {
+          if (res.code) {
+            wx.request({
+              url: 'https://api.gcms.mygear.cn/wechat_login/get_session_info?code=' + res.code,
+              data: {},
+              header: {
+                'content-type': 'json'
+              },
+              success: function (res) {
+                _this.openId = res.data.data.openid // 返回openid
+                _this._getMemberOpenId(_this.openId)
+              }
+            })
+          }
+        }
+      })
+    },
+    _getMemberOpenId (openId) {
+      this.openId = openId
+      getMemberOpenId(openId).then((res) => {
+        if (res.data.code === ERR_OK) {
+          this.id = res.data.data.id
+        }
+      }, (err) => {
+        console.log(err)
+      })
     }
   }
 }
@@ -286,10 +324,6 @@ export default {
           flex-direction column
           align-content space-around
           padding px2rem(30) px2rem(30) px2rem(40) px2rem(30)
-          .video-num
-            font-size $font-size-small
-            color $color-text2
-            margin-bottom px2rem(20)
           .video-title
             font-size $font-size-medium-x
             white-space pre-line

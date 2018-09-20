@@ -13,7 +13,7 @@
       
     </div>
 
-    <tab :tabBar="tabBar" :tabContent="tabContent"></tab>
+    <tab v-if="tabDetail" :tabBar="tabBar" :tabContent="tabDetail"></tab>
     
     <!-- <div class="book">预定课程</div> -->
     <div class="loading-container" v-if="isData">
@@ -32,25 +32,14 @@ export default {
     return {
       isData: true,
       courseDetail: [],
-      imageUrls: []
-      // tabBar: [
-      //   { 'title': '课程介绍' },
-      //   { 'title': '训练效果' },
-      //   { 'title': '时22间' }
-      // ],
-      // tabContent: [
-      //   { 'content': '健身教练，分为团体操课程教练和私人教练，组织健身者做计划中的健身运动或健身操。健身教练是指在健身俱乐部中指导会员进行训练的工作人员，其作具有互动性、针对性等特点，并且是按小时收费的。',
-      //     'isTime': true,
-      //     'week': '星期二',
-      //     'time': '19:00 -20:00'
-      //   },
-      //   { 'content': '平板支撑（plank）是一种类似于俯卧撑的肌肉训练方法，在锻炼时主要呈俯卧姿势，可以有效的锻炼腹横肌，被公认为训练核心肌群的有效方法。',
-      //     'isTime': false
-      //   },
-      //   { 'content': '时间时间',
-      //     'isTime': false
-      //   }
-      // ]
+      imageUrls: [],
+      tabBar: [
+        { 'title': '教练介绍' },
+        { 'title': '课程介绍' },
+        { 'title': '训练效果' },
+        { 'title': '时间' }
+      ],
+      tabDetail: []
     }
   },
   mounted () {
@@ -69,6 +58,11 @@ export default {
         this.imageUrls = res.data.data.imageUrls
         console.log(res)
         this.isData = false
+        let instructorIntro = {instructorIntro: res.data.data.instructorIntro}
+        let courseIntro = {intro: res.data.data.intro}
+        let courseEffects = {effects: res.data.data.effects}
+        let timeTable = {timeTable: res.data.data.timeTable}
+        this.tabDetail.push(instructorIntro, courseIntro, courseEffects, timeTable)
       })
     }
   },

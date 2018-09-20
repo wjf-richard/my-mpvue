@@ -20,34 +20,122 @@
       </div>
       
     </div>
-    <tab></tab>
-    <div class="book">预定课程</div>
+    <tab v-if="tabDeatil" :tabContent="tabDeatil" :tabBar="tabBar"></tab>
+    <div class="book" v-if="!isPayed" @click="toPay()">开通VIP会员</div>
+    <div class="book" v-else-if="isPayed && !isBought" @click="toBuyCourses()">购买课程</div>
+    <div class="book" v-else-if="isBought" @click="toBookInstructor()">预定课程</div>
   </div>
 </template>
 
 <script>
-// import {ERR_OK} from '@/http/config'
-import {getPopularityInstructors, getInstructorsDetail} from '@/http/instructors'
+import {ERR_OK} from '@/http/config'
+import {getPopularityInstructors, getInstructorsDetail, getReastTimes} from '@/http/instructors'
 import tab from '@/components/tab'
+import {getMemberOpenId, checkMemberIsPay} from '@/http/member'
+import {getInstructorsList} from '@/http/bookInstructor'
 
 export default {
   data () {
     return {
+      openId: '',
+      id: '',
+      instructorId: '',
+      isPayed: false,
+      isBought: false,
       instructorDetail: {
         instructor: []
-      }
+      },
+      tabDeatil: [],
+      tabBar: [
+        { 'title': '课程介绍' },
+        { 'title': '训练效果' },
+        { 'title': '时间' }
+      ]
     }
   },
   mounted () {
     // 获取openID
     this.instructorDetail.instructorId = this.instructorId
     this._getInstructorsDetail(this.instructorDetail.instructorId)
+    this._getReastTimes(this.instructorId, this.id)
   },
   onLoad (options) {
+    Object.assign(this.$data, this.$options.data())
+    this.openId = options.openId
+    this.id = options.id
+    this._checkMemberIsPay(this.openId)
     this.instructorId = options.instructorId
-    console.log('instructorid', this.instructorId)
   },
   methods: {
+    toPay () {
+      const url = '/pages/pay/main?openId=' + this.openId
+      wx.navigateTo({ url })
+    },
+    toBuyCourses () {
+      const url = '/pages/selectCourses/main?instructorId=' + this.instructorId + '&openId=' + this.openId + '&id=' + this.id
+      wx.navigateTo({ url })
+    },
+    toBookInstructor () {
+      const url = '/pages/bookInstructor/main?instructorId=' + this.instructorId + '&id=' + this.id
+      wx.navigateTo({ url })
+    },
+    _getReastTimes (instructorId, id) {
+      getReastTimes(instructorId, id).then((res) => {
+        if (res.data.code === ERR_OK) {
+          this.isBought = true
+        }
+      })
+    },
+    _checkMemberIsPay (openId) {
+      checkMemberIsPay(openId).then((res) => {
+        if (res.data.code === 40004) {
+          this.isPayed = false
+        } else {
+          if (res.data.data.isActivated === true || res.data.data.cardNo) {
+            this.isActivated = res.data.data.isActivated
+            this.isPayed = true
+            this.isBought = false
+            this._getInstructorsList(this.instructorId, this.id)
+            this._getMemberOpenId(openId)
+          } else {
+            this._getMemberOpenId(openId)
+            console.log('false')
+            this.isLogin = true
+          }
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+    _getMemberOpenId (openId) {
+      getMemberOpenId(openId).then((res) => {
+        console.log('获取openID', res)
+        if (res.data.code === ERR_OK) {
+          this.id = res.data.data.id
+
+          this.isLogin = true
+          this.isNotLogin = false
+          console.log('已经登录')
+          this.isData = false
+        } else {
+          console.log('没有登录')
+          this.isLogin = false
+          this.isNotLogin = true
+          this.isData = false
+        }
+      }, (err) => {
+        console.log(err)
+      })
+    },
+    _getInstructorsList (instructorId, id) {
+      getInstructorsList(instructorId, id).then((res) => {
+        if (res.data.code === ERR_OK) {
+          this.isBought = true
+        } else {
+          this.isBought = false
+        }
+      })
+    },
     _getPopularityInstructors () {
       getPopularityInstructors().then((res) => {
         console.log(res)
@@ -55,8 +143,13 @@ export default {
     },
     _getInstructorsDetail (instructorId) {
       getInstructorsDetail(instructorId).then((res) => {
-        console.log(res)
-        this.instructorDetail.instructor = res.data.data.instructor
+        if (res.data.code === ERR_OK) {
+          this.instructorDetail.instructor = res.data.data.instructor
+          let instructorIntro = {intro: res.data.data.intro}
+          let instructorEffects = {effects: res.data.data.effects}
+          let timeTable = {timeTable: res.data.data.timeTable}
+          this.tabDeatil.push(instructorIntro, instructorEffects, timeTable)
+        }
       })
     }
   },

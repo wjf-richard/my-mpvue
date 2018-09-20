@@ -10,3 +10,13 @@ export function payMent (openId) {
     {method: 'get'}
   )
 }
+
+// 购买教练课程节数
+export function payInstructorCourse (openId, number, fee, instructorId) {
+  const url = '/wechat_pay/instructor_course?openId=' + openId + '&number=' + number + '&fee=' + fee + '&instructorId=' + instructorId
+  return fly.request(
+    url,
+    null,
+    {method: 'get'}
+  )
+}

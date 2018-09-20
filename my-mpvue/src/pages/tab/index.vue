@@ -113,6 +113,7 @@ export default {
   
 
   .tabbar-bottom
+    font-size $font-size-large
     color: $color-text0
     font-weight 900
   

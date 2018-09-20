@@ -20,7 +20,11 @@
       </swiper>
     </div>
     <div class="instructor-list">
-      <div class="instructor-item" v-for="(item, index) in instructors" :key="item.id" @click="toInstructorDetail(item.id)">
+      <div class="instructor-item" 
+        v-for="(item, index) in instructors" 
+        :key="item.id" 
+        @click="toInstructorDetail(item.id, openId, id)"
+      >
         <div class="left">
           <img class="instructor-heads" :src="item.avatarUrl" alt="">
         </div>
@@ -28,17 +32,23 @@
           <div class="mid-content">
             <div class="instructor-name-flag">
               <p class="name">{{item.name}}</p>
-              <span class="flag" v-for="(flagItem, flagIndex) in item.specialities" :key="flagIndex">{{flagItem}}</span>
+              <span class="flag" 
+                v-for="(flagItem, flagIndex) in item.specialities" 
+                :key="flagIndex"
+              >{{flagItem}}</span>
             </div>
             <div class="cost"><span>{{item.fee}}</span>元 / 小时</div>
             <div class="type">
-              <span class="type-item"v-for="(tagsItem, tagsIndex) in item.tags" :key="tagsIndex">{{tagsItem}}</span>
+              <span class="type-item" 
+                v-for="(tagsItem, tagsIndex) in item.tags" 
+                :key="tagsIndex"
+              >{{tagsItem}}</span>
               
             </div>
           </div>
         </div>
         <div class="right">
-          <a class="book-btn" @click="toInstructorDetail(item.id)">预约</a>
+          <a class="book-btn" @click="toInstructorDetail(item.id, openId, id)">预约</a>
         </div>
       </div>
       
@@ -50,17 +60,22 @@
 import {getOnly} from '@/http/setting'
 import {getInstructorsList} from '@/http/instructors'
 import {ERR_OK} from '@/http/config'
+import {getMemberOpenId} from '@/http/member'
+
 export default {
   data () {
     return {
       imgUrls: [],
       instructors: [],
-      isLoaded: false
+      isLoaded: false,
+      openId: '',
+      id: ''
     }
   },
   onLoad () {
     this._getOnly()
     this._getInstructorsList()
+    this.getWxLoginResult()
   },
   methods: {
     _getOnly () {
@@ -69,8 +84,8 @@ export default {
         console.log('教练轮播', this.imgUrls)
       })
     },
-    toInstructorDetail (instructorId) {
-      const url = '/pages/instructorDetail/main?instructorId=' + instructorId
+    toInstructorDetail (instructorId, openId, id) {
+      const url = '/pages/instructorDetail/main?instructorId=' + instructorId + '&openId=' + openId + '&id=' + id
       // console.log('热门教练', instructorId)
       wx.navigateTo({ url })
     },
@@ -82,6 +97,51 @@ export default {
           this.$emit('isLoaded', this.isLoaded)
         }
         // console.log(res)
+      })
+    },
+    getWxLoginResult () {
+      console.log('Instructor...')
+      let _this = this
+      wx.login({
+        success (loginResult) {
+          var code = loginResult.code
+          if (code) {
+            console.log('wx.login code..' + loginResult.code)
+          }
+        },
+        fail (loginError) {
+          console.log('微信登录失败，请检查网络状态')
+        },
+        complete (res) {
+          // console.log('完成', res)
+          if (res.code) {
+            wx.request({
+              url: 'https://api.gcms.mygear.cn/wechat_login/get_session_info?code=' + res.code,
+              data: {},
+              header: {
+                'content-type': 'json'
+              },
+              success: function (res) {
+                console.log('会员openID', res.data.data.openid)
+                if (res.data.data.openid) {
+                  _this._getMemberOpenId(res.data.data.openid)
+                }
+                _this.openId = res.data.data.openid // 返回openid
+              }
+            })
+          }
+        }
+      })
+    },
+    _getMemberOpenId (openId) {
+      // console.log(openId)
+      getMemberOpenId(openId).then((res) => {
+        if (res.data.code === ERR_OK) {
+          this.id = res.data.data.id
+          console.log('会员id', this.id)
+        }
+      }, (err) => {
+        console.log(err)
       })
     }
   }
@@ -200,4 +260,3 @@ export default {
           margin px2rem(30) 0
 
 </style>
-

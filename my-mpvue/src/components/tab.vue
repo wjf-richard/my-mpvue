@@ -8,16 +8,27 @@
     </scroll-view>
     <swiper :current="currentTab" @change="changeTab">
       <swiper-item class="swiper-item" v-for="(item, index) in tabContent" :key="index" >
-        <div v-if="index < 2">
+        <div v-if="item.instructorIntro">
           <div class="content">
-            {{item.content}}
+            {{item.instructorIntro}}
           </div>
         </div>
-        <div v-if="index === 2">
-          <div class="time">
-            <span class="time-item">{{item.week}}</span>
-            <span class="time-item">{{item.time}}</span>
+        <div v-if="item.intro">
+          <div class="content">
+            {{item.intro}}
           </div>
+        </div>
+        <div v-else-if="item.effects">
+          <div class="content">
+            {{item.effects}}
+          </div>
+        </div>
+        <div class="tiem-wrapper" v-if="item.timeTable" v-for="(timeTableItem, timeIndex) in item.timeTable" :key="timeIndex">
+          <div class="time">
+            <span class="time-item">{{timeTableItem.day}}</span>
+            <span class="time-item">{{timeTableItem.startTime}}-{{timeTableItem.endTime}}</span>
+          </div>
+
         </div>
       </swiper-item>
       
@@ -29,35 +40,20 @@
 export default {
   data () {
     return {
-      tabBar: [
-        { 'title': '课程介绍' },
-        { 'title': '训练效果' },
-        { 'title': '时间' }
-      ],
-      tabContent: [
-        { 'content': '健身教练，分为团体操课程教练和私人教练，组织健身者做计划中的健身运动或健身操。健身教练是指在健身俱乐部中指导会员进行训练的工作人员，其作具有互动性、针对性等特点，并且是按小时收费的。',
-          'week': '星期二',
-          'time': '19:00 -20:00'
-        },
-        { 'content': '平板支撑（plank）是一种类似于俯卧撑的肌肉训练方法，在锻炼时主要呈俯卧姿势，可以有效的锻炼腹横肌，被公认为训练核心肌群的有效方法。'
-        },
-        { 'week': '星期二',
-          'time': '19:00 -20:00'
-        }
-      ],
+      tabBar: [],
       currentTab: 0
     }
   },
-  // props: {
-  //   tabBar: {
-  //     type: Array,
-  //     default: []
-  //   },
-  //   tabContent: {
-  //     type: Array,
-  //     default: []
-  //   }
-  // },
+  props: {
+    tabBar: {
+      type: Array,
+      default: () => []
+    },
+    tabContent: {
+      type: Array,
+      default: () => []
+    }
+  },
   methods: {
     clickTab (e) {
       this.currentTab = e
@@ -74,7 +70,6 @@ export default {
   @import '~common/stylus/mixin.styl'
   .contain
     margin px2rem(35)
-  
     .top
       margin px2rem(35) 0
       width auto
@@ -83,48 +78,51 @@ export default {
       display flex
       justify-content flex-start
       align-items center
-      
     .tabbar 
-      margin-right px2rem(40)
+      margin 0 px2rem(20)
       font-size $font-size-medium-x
       color $color-text1
       font-weight 400
       height px2rem(70)
       display inline-block
       position relative
-    
-
     .tabbar-bottom 
       color #000000
       font-weight 900
-    
     .active-bottom
       position absolute
       bottom 0
-      left px2rem(38)
-      width px2rem(52)
+      left 33%
+      width 50%
       height px2rem(8)
       border-radius px2rem(30)
       background #2196f3
-    
-    .swiper-item
-      .content
-        color $color-text3
-        letter-spacing px2rem(1.8)
-        line-height px2rem(40)
-        font-size $font-size-medium
-      .time
-        display flex
-        justify-content flex-start
-        align-items center
-        margin-top px2rem(40)
-        .time-item
-          margin-right px2rem(10)
-          color #FF9800
-          background #FFF2DE
-          padding px2rem(10) px2rem(20)
-          font-size $font-size-small
-          border-radius px2rem(30)
+    swiper
+      height px2rem(550)
+      .swiper-item
+        height 100%
+        .content
+          height 100%
+          color $color-text3
+          letter-spacing px2rem(1.8)
+          line-height px2rem(40)
+          font-size $font-size-medium
+        .tiem-wrapper
+          display flex
+          flex-wrap wrap
+          justify-content space-between
+          .time
+            display flex
+            justify-content flex-start
+            align-items center
+            margin-bottom px2rem(40)
+            .time-item
+              margin-right px2rem(10)
+              color #FF9800
+              background #FFF2DE
+              padding px2rem(10) px2rem(20)
+              font-size $font-size-small
+              border-radius px2rem(30)
 
 
 
