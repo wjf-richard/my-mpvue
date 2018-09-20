@@ -1,246 +1,181 @@
 <template>
-  <div class="content-page uk-body">
-    <div class="calendar">
-      <button class="month-less" @click="prevMonth()"></button>
-      <h4>{{ year }}年{{ month }}月{{ date }}日</h4>
-      <button class="month-add" @click="nextMonth()"></button>
-      <table class="sign_tab" border="0px" cellpadding="0px" cellspacing="0px">
-        <thead>
-          <tr>
-            <th>日</th>
-            <th>一</th>
-            <th>二</th>
-            <th>三</th>
-            <th>四</th>
-            <th>五</th>
-            <th>六</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in dateArr" v-if="true" :key="index">
-            <!-- <td v-for="dateData in item" :class="{ 'cur_day': dateData == date, 'ui-state-default': true }" v-if="isCheck(dateData)">
-            </td>
-            <td v-else :class="{ 'over':dateData == '', 'cur_day': dateData == date }">
-              {{dateData}}
-            </td> -->
-            <td class="over" v-for="(dateData, itemIndex) in item" 
-              :key="itemIndex"
-              :class="{ 'cur_day' : dateData ===date}">
-              {{dateData}}
-            </td>
-            
-          </tr>
-        </tbody>
-      </table>
+  <div class="container">
+    <div class="header"></div>
+    <div class="content">
+      <div class="sign-content">
+        <view class="section month cell">
+          <picker mode="date" 
+            fields="month" 
+            @value="date" 
+            start="2017-01" 
+            :end="pickerEnd" 
+            @change="bindDateChange"
+          >
+            <view class="picker">
+              {{date}}
+            </view>
+          </picker>
+          <span class="arrow-box"><i class="bottom-arrow"></i></span>
+        </view>
+        <div class="date-box"  v-if="isData">
+          <div class="date-item cell" v-for="(item, index) in signInData" :key="index">
+            <h3>{{ item.date }}</h3>
+            <span class="integral">积分+ <span>{{ item.credit }}</span></span>
+          </div>
+        </div>
+        <div class="no-data-content" v-else>
+          <div class="move cell">该月份的没有签到o(╥﹏╥)o</div>
+        </div>
+      </div>
+      <!-- <div class="move-data-content">
+        <div class="move cell">加载更多数据...</div>
+      </div> -->
     </div>
   </div>
 </template>
+
 <script>
+import {ERR_OK} from '@/http/config'
+import {signInRecords} from '@/http/signIn'
+
 export default {
   data () {
     return {
-      today: new Date(),
-      year: '',
-      month: '',
-      day: '',
-      date: '',
-      dateArr: [],
-      checkin: [1, 3, 5, 7, 20]
+      signInData: '',
+      id: '',
+      yearMonth: '',
+      monthList: [],
+      pickerEnd: '',
+      date: '2018年09月',
+      isData: true
     }
   },
-  created () {
-    this.year = this.today.getFullYear()
-    this.month = this.today.getMonth() + 1
-    this.day = this.today.getDay()
-    this.date = this.today.getDate()
-    this.getCalendar()
+  onLoad (options) {
+    this.id = options.id
+    console.log('member', this.id)
+  },
+  mounted () {
+    this.yearMonth = this.getYearMonth()
+    this.pickerEnd = this.yearMonth
+    this._signInRecords(this.id, this.yearMonth)
   },
   methods: {
-    isLeap () {
-      // console.log(this.year)
-      const year = this.year
-      if (year % 4 === 0 && year % 100 > 0) {
-        return true
-      } else if (year % 400 === 0 && year % 3200 > 0) {
-        return true
-      } else {
-        return false
+    getYearMonth () {
+      let myDate = new Date()
+      let myMonth = myDate.getMonth() + 1
+      if (myMonth < 10) {
+        myMonth = '0' + myMonth
       }
+      let yearMonth = myDate.getFullYear() + '-' + myMonth
+      return yearMonth
     },
-    getLen () {
-      const month = this.month
-      if (month === 2) {
-        if (this.isLeap) {
-          return 29
+    _signInRecords (id, date) {
+      signInRecords(id, date).then((res) => {
+        console.log(res)
+        if (res.data.code === ERR_OK) {
+          let records = res.data.data
+          console.log(records)
+          this.signInData = records
+          this.isData = true
         } else {
-          return 28
+          this.isData = false
         }
-      } else {
-        if (month < 8) {
-          if (month % 2 > 0) {
-            return 31
-          } else {
-            return 30
-          }
-        } else {
-          if (month % 2 > 0) {
-            return 30
-          } else {
-            return 31
-          }
-        }
-      }
+      })
     },
-    getCalendarTime () {
-      return this.year + '-' + this.month + '-' + this.date
-    },
-    getCalendar () {
-      var len = this.getLen()
-      var d = new Date(this.year, this.month - 1, 1)
-      var dfw = d.getDay()
-      var arr = []
-      // console.log(arr)
-      var tem = 0
-      for (var i = 0; i < 6; i++) {
-        arr[i] = []
-        for (var j = 0; j < 7; j++) {
-          tem++
-          if (tem - dfw > 0 && tem - dfw <= len) {
-            arr[i][j] = tem - dfw
-          } else {
-            arr[i][j] = ''
-          }
-        }
+    bindDateChange (e) {
+      let selectDate = e.target.value
+      let year = selectDate.substr(0, 4)
+      let month = selectDate.substring(6)
+      if (month < 10) {
+        month = '0' + month
       }
-      this.dateArr = arr
-      // console.log(this.dateArr)
-    },
-    nextMonth () {
-      if (this.month === 12) {
-        this.year++
-        this.month = 1
-      } else {
-        this.month++
-      }
-      this.getCalendar()
-    },
-    prevMonth () {
-      if (this.month === 1) {
-        this.year--
-        this.month = 12
-      } else {
-        this.month--
-      }
-      this.getCalendar()
-    },
-    contains (arr) {
-      // console.log(arr)
-      if (
-        (arr[0] === '') &&
-        (arr[1] === '') &&
-        (arr[2] === '') &&
-        (arr[3] === '') &&
-        (arr[4] === '') &&
-        (arr[5] === '') &&
-        (arr[6] === '')
-      ) {
-        return false
-      } else {
-        // console.log('是的')
-        return true
-      }
-    },
-    isCheck (index) {
-      // console.log('index', index)
-      for (let i in this.checkin) {
-        if (index === this.checkin[i]) {
-          // console.log('真的')
-          return true
-        }
-      }
-      return false
+      this.date = year + '年' + month + '月'
+      this._signInRecords(this.id, selectDate)
+      console.log('picker发送选择改变，携带值为', e.target.value)
     }
   }
 }
 </script>
 
-<style scoped lang="stylus" scoped>
+<style lang="stylus" scoped>
   @import '~common/stylus/variable.styl'
   @import '~common/stylus/mixin.styl'
-  .calendar 
-    width 100%
-    margin px2rem(100) 0 px2rem(40) 0
-    color #555
-    position relative
 
+  .container
+    height 100vh
+    .header
+      height 30vh
+      background url(http://pdwhalwaj.bkt.clouddn.com/bg_1.png) no-repeat
+      background-size 100% 100%
+    .content
+      height 70vh
+      overflow-y scroll
+      box-sizing border-box
+      padding px2rem(60) px2rem(60) 0 px2rem(60)
+      .sign-content
+        .cell
+          padding px2rem(20) 0
+          height px2rem(40)
+        .month
+          font-size $font-size-medium
+          color $color-text1
+          display flex
+          justify-content flex-start
+          align-items center
+        .section
+          position relative
+          picker
+            width px2rem(200)
+            z-index 10
+          .arrow-box
+            z-index 9
+            position absolute
+            left px2rem(150)
+            top px2rem(36)
+            display flex
+            justify-content flex-start
+            align-items center
 
-  .calendar h4 
-    border-bottom px2rem(4) solid #5bd999
-    text-align center
-    font-size px2rem(44)
-    font-weight 700
-    margin-bottom 0px
-    padding px2rem(24) 0
-
-
-  .calendar button 
-    position absolute
-    width px2rem(50)
-    height px2rem(50)
-    top px2rem(30)
-
-  .calendar button:focus
-    border none
-    outline none
-
-  .calendar button.month-less 
-    left px2rem(40)
-    background url(./left-icon.png) no-repeat left -60px
-
-  .calendar button.month-add 
-    right px2rem(40)
-    background url(./right-icon.png) no-repeat left -60px
-
-
-  .calendar .sign_tab 
-    width 100%
-    border-collapse collapse
-    border px2rem(2) solid #e8e8e8
-    border-top 0
-    table-layout fixed
-
-  .calendar .sign_tab thead tr, .calendar .sign_tab tbody tr
-    display flex
-    justify-content center
-    align-items center
-  .calendar .sign_tab th, .calendar .sign_tab td
-    flex 1
-    display flex
-    justify-content center
-    align-items center
-    text-align center
-    height 14.28571428571429vw
-    font-weight 700
-
-
-  .calendar .sign_tab td 
-    border 1px solid #e8e8e8
-    height 14.28571428571429vw
-    text-align center
-    font-size px2rem(30)
-    font-family arial
-
-
-  .calendar .sign_tab td.over 
-    background-color #fff
-    border-left 0
-    border-right 0
-
-  .calendar .ui-state-default
-    background url(./checkin.png) no-repeat center center
-
-  .calendar .sign_tab td.cur_day 
-    background-color #FFD2D2
-    color #FFF
+        .date-box
+          font-size $font-size-medium
+          .date-item
+            display flex
+            justify-content space-between
+            align-items center
+            border-bottom px2rem(1) solid $color-border
+            h3
+              font-weight 900
+              color #000
+            .integral
+              color #ED0D0D
+        .no-data-content
+          .cell
+            padding px2rem(20) 0
+            height px2rem(40)
+          .move
+            font-size $font-size-medium
+            color $color-text1
+            display flex
+            justify-content center
+            align-items center
+  .bottom-arrow:before
+    content:""
+    border: px2rem(12) solid #999
+    border-bottom:none
+    border-right-color:transparent
+    border-left-color:transparent
+    position:relative
+    top: px2rem(18)
+    left: px2rem(12)
+    border-radius: px2rem(4)
+  .bottom-arrow:after
+    content:""
+    border: px2rem(12) solid #fff
+    border-bottom:none
+    border-right-color:transparent
+    border-left-color:transparent
+    position:relative
+    top:px2rem(14)
+    left: -(px2rem(12))
 
 </style>
