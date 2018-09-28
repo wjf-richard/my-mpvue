@@ -23,12 +23,11 @@
             {{item.effects}}
           </div>
         </div>
-        <div class="tiem-wrapper" v-if="item.timeTable" v-for="(timeTableItem, timeIndex) in item.timeTable" :key="timeIndex">
-          <div class="time">
+        <div class="tiem-wrapper" >
+          <div class="time" v-if="item.timeTable" v-for="(timeTableItem, timeIndex) in item.timeTable" :key="timeIndex">
             <span class="time-item">{{timeTableItem.day}}</span>
             <span class="time-item">{{timeTableItem.startTime}}-{{timeTableItem.endTime}}</span>
           </div>
-
         </div>
       </swiper-item>
       

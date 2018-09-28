@@ -1,8 +1,7 @@
 <template>
   <div class="container ">
-    
+    <h1 class="title">课程选择</h1>
     <div class="baseMsg">
-      <h1 class="title">课程选择</h1>
       <div class="content">
         <div class="item">
           <div class="item-label">教练</div>
@@ -42,11 +41,6 @@ import {payInstructorCourse} from '@/http/pay'
 export default {
   data () {
     return {
-      items: [
-        {name: 'USA', value: '8节课／2000'},
-        {name: 'CHN', value: '12节课／3000', checked: 'true'},
-        {name: 'BRA', value: '20节课／5000'}
-      ],
       SectionDiscount: [],
       instructorName: [],
       id: '',
@@ -125,67 +119,6 @@ export default {
         }
       })
     }
-  //   _getOnly () {
-  //     getOnly().then((res) => {
-  //       this.memberPrice = res.data.data.memberPrice
-  //     })
-  //   },
-  //   radioChange (e) {
-  //     console.log('radio发生change事件，携带value值为：', e.target.value)
-  //     this.selectedAgree = e.target.value
-  //   },
-  //   payMethodChange (e) {
-  //     console.log('payMethod', e.target.value)
-  //     console.log(e)
-  //     this.selectPayMethod = e.target.value
-  //     this.member.payMethod = e.target.value
-  //     if (this.member.payMethod === '线下支付') {
-  //       console.log('改变了')
-  //       this.isInline = false
-  //     } else {
-  //       this.isInline = true
-  //     }
-  //   },
-  //   isAgreeToPay () {
-  //     if (this.isAgree === this.selectedAgree) {
-  //       this.goToPay()
-  //     } else {
-  //       this.$tips.alert('请同意该协议')
-  //     }
-  //   },
-  //   goToPay () {
-  //     console.log('...', this.member.openId)
-  //     payMent(this.member.openId).then((res) => {
-  //       console.log('支付', res)
-  //       if (res.data.code === ERR_OK) {
-  //         wx.requestPayment({
-  //           timeStamp: res.data.data.timeStamp,
-  //           nonceStr: res.data.data.nonceStr,
-  //           package: res.data.data.package,
-  //           signType: res.data.data.signType,
-  //           paySign: res.data.data.paySign,
-  //           success: function (res) {
-  //             console.log('成功后的', res)
-  //             wx.showToast({
-  //               title: '支付成功',
-  //               success: function () {
-  //                 console.log('准备跳转')
-  //                 wx.switchTab({
-  //                   url: '/pages/user/main'
-  //                 })
-  //               }
-  //             })
-  //           },
-  //           fail: function (res) {
-  //             console.log('失败后的', res)
-  //             // wx.showToast({titlt: '支付失败' + res})
-  //           }
-  //         })
-  //       } else {
-  //         wx.showToast({title: '服务器忙' + res.data.code + res.data.msg})
-  //       }
-  //     })
-  //   }
   }
 }
 </script>
@@ -196,17 +129,20 @@ export default {
   
 
   .container
-    background $color-background-d
+    background $color-background
     width 100%
     height 100vh
+    .title
+      font-size $font-size-large-lg
+      font-weight 900
+      color #000
+      padding px2rem(20) px2rem(60)
+      background #FFFFFF
+      box-shadow 0 px2rem(6) px2rem(26) 0 rgba(0,0,0,0.10)
     .baseMsg
       padding 0 px2rem(60)
       margin-bottom px2rem(20)
       box-sizing content-box
-      .title
-        padding px2rem(30) 0
-        font-size $font-size-large-x
-        font-weight 900
       .content
         .item
           display flex
@@ -247,6 +183,8 @@ export default {
         display -ms-flexbox
         padding 0
         font-size $font-size-medium-x
+        box-shadow 0 px2rem(6) px2rem(26) 0 rgba(0,0,0,0.10),
+            0 px2rem(6) px2rem(26) 0 rgba(0,0,0,0.10)
         .left, .right
           display flex
           display -ms-flexbox

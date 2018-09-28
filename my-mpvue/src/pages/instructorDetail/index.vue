@@ -10,9 +10,7 @@
           <div class="self-introduction">{{instructorDetail.instructor.brief}}</div>
           <div class="type">
             <span class="type-item"v-for="(tagsItem, index) in instructorDetail.instructor.tags" :key="index">{{tagsItem}}</span>
-            
           </div>
-          <!-- <div class="cost"><span>300</span>元 / 小时</div> -->
         </div>
         <div class="right">
           <img class="instructor-heads" :src="instructorDetail.instructor.avatarUrl" alt="">
@@ -21,8 +19,8 @@
       
     </div>
     <tab v-if="tabDeatil" :tabContent="tabDeatil" :tabBar="tabBar"></tab>
-    <div class="book" v-if="!isPayed" @click="toPay()">开通VIP会员</div>
-    <div class="book" v-else-if="isPayed && !isBought" @click="toBuyCourses()">购买课程</div>
+    <div class="book" v-if="!isPaid" @click="toPay()">开通VIP会员</div>
+    <div class="book" v-else-if="isPaid && !isBought" @click="toBuyCourses()">购买课程</div>
     <div class="book" v-else-if="isBought" @click="toBookInstructor()">预定课程</div>
   </div>
 </template>
@@ -40,7 +38,7 @@ export default {
       openId: '',
       id: '',
       instructorId: '',
-      isPayed: false,
+      isPaid: false,
       isBought: false,
       instructorDetail: {
         instructor: []
@@ -89,11 +87,16 @@ export default {
     _checkMemberIsPay (openId) {
       checkMemberIsPay(openId).then((res) => {
         if (res.data.code === 40004) {
-          this.isPayed = false
+          this.isPaid = false
         } else {
-          if (res.data.data.isActivated === true || res.data.data.cardNo) {
+          if (res.data.data.isActivated === true) {
+            this.isPaid = res.data.data.isPaid
             this.isActivated = res.data.data.isActivated
-            this.isPayed = true
+            this.isBought = false
+            this._getInstructorsList(this.instructorId, this.id)
+            this._getMemberOpenId(openId)
+          } else if (res.data.data.isPaid === true) {
+            this.isPaid = res.data.data.isPaid
             this.isBought = false
             this._getInstructorsList(this.instructorId, this.id)
             this._getMemberOpenId(openId)
@@ -144,6 +147,7 @@ export default {
     _getInstructorsDetail (instructorId) {
       getInstructorsDetail(instructorId).then((res) => {
         if (res.data.code === ERR_OK) {
+          this.tabDeatil = [ ]
           this.instructorDetail.instructor = res.data.data.instructor
           let instructorIntro = {intro: res.data.data.intro}
           let instructorEffects = {effects: res.data.data.effects}
@@ -186,7 +190,7 @@ export default {
             padding 0 px2rem(12)
             margin-left px2rem(16)
             color $color-background
-            background-image url(http://pdwhalwaj.bkt.clouddn.com/flag.png)
+            background-image url(http://gcms.qncdn.mygear.vip/flag.png)
             background-repeat no-repeat; 
             background-size 100% 100%
             -moz-background-size 100% 100%
@@ -201,12 +205,15 @@ export default {
           letter-spacing px2rem(1.6)
           color $color-text1
         .type
+          display flex
+          flex-wrap wrap
+
           .type-item
             font-size $font-size-small-s
-            padding px2rem(2) px2rem(16)
+            padding px2rem(10) px2rem(16)
             background #F2F2F2
             color $color-text1
-            margin-right px2rem(20)
+            margin 0 px2rem(20) px2rem(20) 0
         .cost
           font-size $font-size-small
           color #4FBEFD

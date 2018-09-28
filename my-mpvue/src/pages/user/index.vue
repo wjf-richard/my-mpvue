@@ -4,7 +4,7 @@
       <h1>您好，请先登录</h1>
       <div class="bg-btn">
         <div class="login-btn" @click="toMemberMsg()">
-          成为会员
+          填写资料
         </div>
       </div>
     </div>
@@ -12,55 +12,75 @@
       <div class="member-name">
         <h1>
           Hi，{{member.name}}
-          <span v-if="member.gender === '男'">先生</span>
+          <span v-if="member.gender === '先生'">先生</span>
           <span v-else>女士</span>
         </h1>
+        <!-- <div class="signIn" @click="_memberSignIn(openId)">
+          签到
+        </div> -->
       </div>
-      <div class="bg-btn" @click="toUpdataMsg()">
-        <div class="vip-num" v-if="member.cardNo && isActivated">
-          {{ member.cardNo }}
+      <div class="bg-btn" @click.stop="toUpdataMsg()">
+        <div class="vip-num" v-if="isActivated">
+          <div class="cardNo">
+            {{ member.cardNo }}
+          </div>
+          <div class="deadline">
+
+          </div>
         </div>
-        <div class="vip-num" v-else-if="!member.cardNo && isActivated">
+        <div class="vip-num" v-else-if="isPaid">
             确认中...
         </div>
-        <div class="not-vip-num" v-else  @click="toPay()">
-          开通VIP会员
+        <div class="not-vip-num" v-else  @click.stop="toPay()">
+          开通年度VIP会员
         </div>
       </div>
     </div>
     <div class="vip-detail-list" v-if="isLogin">
+      <div class="detail-item" v-if="expiryDate != null">
+        <div class="type">
+          <span class="icon">
+            <img src="http://gcms.qncdn.mygear.vip/deadline.png" alt="">
+          </span>
+          <span class="title">有效期限</span>
+        </div>
+        <div class="content"><span class="integral">{{member.expiryDate}}</span></div>
+      </div>
       <div class="detail-item">
         <div class="type">
           <span class="icon">
-            <img src="http://pdwhalwaj.bkt.clouddn.com/vip_integral.png" alt="">
+            <img src="http://gcms.qncdn.mygear.vip/vip_integral.png" alt="">
           </span>
           <span class="title">我的积分</span>
         </div>
         <div class="content"><span class="integral">{{member.credit}}</span></div>
       </div>
-      <div class="detail-item">
+      <!-- <div class="detail-item" @click="toMyBook()">
         <div class="type">
           <span class="icon">
-            <img src="http://pdwhalwaj.bkt.clouddn.com/vip_coach.png" alt="">
+            <img src="http://gcms.qncdn.mygear.vip/vip_coach.png" alt="">
           </span>
-          <span class="title">我的私教</span>
+          <span class="title">我的预约</span>
         </div>
-        <div class="content"><span class="num"></span></div>
-      </div>
-      <div class="detail-item" @click="toSignIn()">
+        <div class="content right-arrow">
+          <span class="num">
+            <img src="../../common/images/back.png" alt="">
+          </span>
+        </div>
+      </div> -->
+      <!-- <div class="detail-item" @click="toSignIn()">
         <div class="type">
           <span class="icon">
-            <img src="http://pdwhalwaj.bkt.clouddn.com/sign.png" alt="">
+            <img src="http://gcms.qncdn.mygear.vip/sign.png" alt="">
           </span>
           <span class="title">我的签到</span>
         </div>
-        <div class="content">
-          <span class="num">&gt;</span>
+        <div class="content right-arrow">
+          <span class="num">
+            <img src="../../common/images/back.png" alt="">
+          </span>
         </div>
-      </div>
-      <div class="signIn" @click="_memberSignIn(openId)">
-        签到
-      </div>
+      </div> -->
     </div>
     <div class="loading-container" v-if="isData">
       <loading></loading>
@@ -80,14 +100,11 @@ export default {
       isLogin: '',
       isData: true,
       isActivated: false,
+      isPaid: false,
       openId: '',
       id: '',
-      member: {
-        name: '',
-        credit: '',
-        cardNo: '',
-        gender: ''
-      }
+      member: '',
+      expiryDate: ''
     }
   },
   components: {
@@ -113,9 +130,15 @@ export default {
       const url = '/pages/pay/main?openId=' + this.openId
       wx.navigateTo({ url })
     },
+    toMyBook () {
+      setTimeout(() => {
+        const url = '/pages/myBook/main?id=' + this.id
+        wx.navigateTo({ url })
+      }, 17)
+    },
     toSignIn () {
       setTimeout(() => {
-        const url = '/pages/signIn/main?id=' + this.id
+        const url = '/pages/signIn/main?id=' + this.id + '&openId=' + this.openId
         wx.navigateTo({ url })
       }, 500)
     },
@@ -164,11 +187,18 @@ export default {
           this.isNotLogin = true
           this.isData = false
         } else {
-          console.log(res.data.data)
+          console.log('是否激活', res.data.data)
           console.log('isACTIVEEADTED', res.data.data.isActivated)
-          if (res.data.data.isActivated === true || res.data.data.cardNo) {
+          console.log('isPaid', res.data.data.isPaid)
+          if (res.data.data.isActivated === true) {
+            this.isPaid = res.data.data.isPaid
             this.isActivated = res.data.data.isActivated
             console.log('true')
+            this.isLogin = true
+            this.isNotLogin = false
+            this._getMemberOpenId(openId)
+          } else if (res.data.data.isPaid === true) {
+            this.isPaid = res.data.data.isPaid
             this.isLogin = true
             this.isNotLogin = false
             this._getMemberOpenId(openId)
@@ -188,13 +218,11 @@ export default {
         console.log('获取openID', res)
         if (res.data.code === ERR_OK) {
           this.id = res.data.data.id
-          this.member.name = res.data.data.name
-          this.member.credit = res.data.data.credit
-          this.member.cardNo = res.data.data.cardNo
-          this.member.gender = res.data.data.gender
+          this.member = res.data.data
+          this.expiryDate = res.data.data.expiryDate
           this.isLogin = true
           this.isNotLogin = false
-          console.log('已经登录')
+          console.log('已经登录', res.data.data)
           this.isData = false
         } else {
           console.log('没有登录')
@@ -228,7 +256,7 @@ export default {
   .container
     .notLogin
       h1
-        margin px2rem(40) px2rem(60)
+        margin px2rem(30) px2rem(60)
         font-weight 900
         font-size $font-size-large-x
       .bg-btn
@@ -237,7 +265,7 @@ export default {
         box-sizing border-box
         margin 0 px2rem(8%)
         overflow hidden
-        background url(http://pdwhalwaj.bkt.clouddn.com/VIP.png) no-repeat
+        background url(http://gcms.qncdn.mygear.vip/VIP.png) no-repeat
         background-size 100% 100%
         border-radius px2rem(20)
         box-shadow 0 10px 20px 0 rgba(22,14,67,0.15),
@@ -263,8 +291,10 @@ export default {
           border-radius px2rem(50)
     .logined
       .member-name
+        display flex
+        justify-content space-between
+        margin px2rem(30) px2rem(60)
         h1
-          margin px2rem(40) px2rem(60)
           font-weight 900
           font-size $font-size-large-x
           span
@@ -277,7 +307,7 @@ export default {
         box-sizing border-box
         margin 0 px2rem(8%)
         overflow hidden
-        background url(http://pdwhalwaj.bkt.clouddn.com/VIP-Copy.png) no-repeat
+        background url(http://gcms.qncdn.mygear.vip/VIP-Copy.png) no-repeat
         background-size 100% 100%
         border-radius px2rem(20)
         box-shadow 0 10px 20px 0 rgba(22,14,67,0.15),
@@ -291,6 +321,10 @@ export default {
           position absolute
           bottom px2rem(26)
           left px2rem(40)
+          display flex
+          flex-direction column
+          .deadline
+            font-size $font-size-small-md
         .not-vip-num
           font-size $font-size-medium
           color $color-background
@@ -328,26 +362,28 @@ export default {
           .title
             margin-left px2rem(40)
             font-size $font-size-medium-x
+      .right-arrow
+        height px2rem(26)
+        width px2rem(15)
       .content
         font-size $font-size-medium-x
         color #FE335C
         .num
-          height px2rem(80)
-          width px2rem(80)
+          height 100%
+          width 100%
           img
             width 100%
             height 100%
         .back
           width px2rem(20)
           height px2rem(25)
-      .signIn
-        color $color-background
-        font-size $font-size-medium-x
-        width px2rem(80)
-        text-align center
-        padding px2rem(20) px2rem(40)
-        background #FF9800 
-        border-radius px2rem(100)
-        float right
-
+  .signIn
+    color $color-background
+    font-size $font-size-medium-x
+    width px2rem(80)
+    height px2rem(30)
+    text-align center
+    padding px2rem(20) px2rem(40)
+    background #FF9800 
+    border-radius px2rem(100)
 </style>

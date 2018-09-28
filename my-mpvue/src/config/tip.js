@@ -9,7 +9,7 @@ export default class Tips {
    * 弹出提示框
    */
 
-  static success (title, duration = 600) {
+  static success (title, duration = 1000) {
     setTimeout(() => {
       wx.showToast({
         title: title,
@@ -38,6 +38,7 @@ export default class Tips {
         showCancel: true,
         success: res => {
           if (res.confirm) {
+            console.log(res.confirm)
             resolve(payload)
           } else if (res.cancel) {
             reject(payload)

@@ -67,7 +67,6 @@ export default {
     this.instructorId = options.instructorId
     this.id = options.id
     this._getBookableDate(this.instructorId, this.getToday())
-    // 设置时间
   },
   methods: {
     getDateList () {
@@ -135,6 +134,7 @@ export default {
     changeTab (e) {
       this.currentTab = e.mp.detail.current
       this.startYear = this.tabBar[this.currentTab].date
+      this._getBookableDate(this.instructorId, this.startYear)
       console.log('左右滑动的改变', this.startYear)
     },
     clickBook (index, startTime) {
@@ -164,9 +164,12 @@ export default {
     },
     _addInstrtuctorBook () {
       addInstrtuctorBook(this.instructorId, this.id, this.startYearDate).then((res) => {
+        console.log(this.instructorId, this.id, this.startYearDate, res)
         if (res.data.code === ERR_OK) {
           console.log(res)
           this.$tips.alert('预约成功，记得按时来上课哦(*^▽^*)')
+          this._getBookableDate(this.instructorId, this.getToday())
+          this._getReastTimes(this.instructorId, this.id)
         } else {
           this.$tips.alert('服务器出错，请稍后在预约...')
         }
@@ -278,7 +281,7 @@ export default {
             align-items center
     .header
       height 30vh
-      background url(http://pdwhalwaj.bkt.clouddn.com/bg2.png) no-repeat
+      background url(http://gcms.qncdn.mygear.vip/bg2.png) no-repeat
       background-size 100% 100%
 
     .remain

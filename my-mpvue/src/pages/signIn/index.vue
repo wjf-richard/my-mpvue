@@ -1,6 +1,10 @@
 <template>
   <div class="container">
-    <div class="header"></div>
+    <div class="header">
+      <div class="signIn" @click="_memberSignIn(openId)">
+        签到
+      </div>
+    </div>
     <div class="content">
       <div class="sign-content">
         <view class="section month cell">
@@ -36,13 +40,13 @@
 
 <script>
 import {ERR_OK} from '@/http/config'
-import {signInRecords} from '@/http/signIn'
-
+import {signInRecords, memberSignIn} from '@/http/signIn'
 export default {
   data () {
     return {
       signInData: '',
       id: '',
+      openId: '',
       yearMonth: '',
       monthList: [],
       pickerEnd: '',
@@ -52,6 +56,7 @@ export default {
   },
   onLoad (options) {
     this.id = options.id
+    this.openId = options.openId
     console.log('member', this.id)
   },
   mounted () {
@@ -74,7 +79,7 @@ export default {
         console.log(res)
         if (res.data.code === ERR_OK) {
           let records = res.data.data
-          console.log(records)
+          console.log(records, '新的')
           this.signInData = records
           this.isData = true
         } else {
@@ -92,6 +97,18 @@ export default {
       this.date = year + '年' + month + '月'
       this._signInRecords(this.id, selectDate)
       console.log('picker发送选择改变，携带值为', e.target.value)
+    },
+    _memberSignIn (openId) {
+      memberSignIn(openId).then((res) => {
+        console.log(res)
+        if (res.data.code === ERR_OK) {
+          this.$tips.success('签到成功')
+          this._signInRecords(this.id, this.yearMonth)
+        } else {
+          this.$tips.alert('今天已经签到了，明天继续哦！')
+          this._signInRecords(this.id, this.yearMonth)
+        }
+      })
     }
   }
 }
@@ -105,8 +122,20 @@ export default {
     height 100vh
     .header
       height 30vh
-      background url(http://pdwhalwaj.bkt.clouddn.com/bg_1.png) no-repeat
+      background url(http://gcms.qncdn.mygear.vip/bg_1.png) no-repeat
       background-size 100% 100%
+      position relative
+      .signIn
+        color #007AFF
+        font-size $font-size-large
+        width px2rem(80)
+        text-align center
+        padding px2rem(20) px2rem(40)
+        background $color-background 
+        border-radius px2rem(100)
+        position absolute
+        right px2rem(30)
+        bottom px2rem(30)
     .content
       height 70vh
       overflow-y scroll
@@ -131,7 +160,8 @@ export default {
             z-index 9
             position absolute
             left px2rem(150)
-            top px2rem(36)
+            height px2rem(80)
+            line-height px2rem(80)
             display flex
             justify-content flex-start
             align-items center

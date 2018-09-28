@@ -11,7 +11,7 @@
         indicator-active-color="#0298FF">
         <block v-for="(item, index) in imgLists" :index="index" :key="key">
           <swiper-item>
-            <a>
+            <a :href="item.url">
               <image :src="item.image" class="slide-image" mode="aspectFill"/>
             </a>
           </swiper-item>
@@ -103,7 +103,7 @@ export default {
       wx.navigateTo({ url })
     },
     toCheckDetail (articleId) {
-      const url = '/pages/articleDetail/main?articleId=' + articleId
+      const url = '/pages/articleDetail/main?articleId=' + articleId + '&isData=' + true
       wx.navigateTo({ url })
     },
     toInstructorDetail (instructorId, openId, id) {
@@ -337,7 +337,7 @@ export default {
             margin px2rem(40) 0 0 0
             background #fff
             padding px2rem(5) px2rem(30)
-            border 1px solid #4FBEFD
+            border px2rem(1) solid #4FBEFD
             border-radius px2rem(100)
             line-height px2rem(50)
             font-size $font-size-medium

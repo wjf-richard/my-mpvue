@@ -12,7 +12,7 @@
       >
         <block v-for="(item, index) in imgUrls" :index="index" :key="key">
           <swiper-item>
-            <a>
+            <a :href="item.url">
               <image :src="item.image" class="slide-image" mode="aspectFill"/>
             </a>
           </swiper-item>
@@ -225,7 +225,7 @@ export default {
               padding 0 px2rem(12)
               margin-left px2rem(10)
               color $color-background
-              background-image url(http://pdwhalwaj.bkt.clouddn.com/flag.png)
+              background-image url(http://gcms.qncdn.mygear.vip/flag.png)
               background-repeat no-repeat; 
               background-size 100% 100%
               -moz-background-size 100% 100%

@@ -93,7 +93,7 @@ export default {
     width 100%
     position fixed
   .top
-    margin 0 px2rem(40) px2rem(20) px2rem(40)
+    margin px2rem(20) px2rem(40)
     width auto
     line-height px2rem(60)
     white-space nowrap

@@ -74,8 +74,8 @@ export default {
     return {
       id: '',
       items: [
-        {name: '男', value: '男'},
-        {name: '女', value: '女'}
+        {name: '男', value: '先生'},
+        {name: '女', value: '女士'}
       ],
       selectGender: '男',
       memberMsg: {

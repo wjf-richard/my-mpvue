@@ -30,6 +30,7 @@ import tab from '@/components/tab'
 export default {
   data () {
     return {
+      courseId: '',
       isData: true,
       courseDetail: [],
       imageUrls: [],
@@ -45,7 +46,7 @@ export default {
   mounted () {
     // 获取courseId
     this.courseDetail.courseId = this.courseId
-    this._getCourseDetail(this.courseDetail.courseId)
+    this._getCourseDetail(this.courseId)
   },
   onLoad (options) {
     this.courseId = options.courseId
@@ -53,6 +54,7 @@ export default {
   },
   methods: {
     _getCourseDetail (courseId) {
+      this.tabDetail = [ ]
       getCourseDetail(courseId).then((res) => {
         this.courseDetail = res.data.data.course
         this.imageUrls = res.data.data.imageUrls

@@ -1,21 +1,30 @@
 <template>
   <div class="container ">
+    <h1 class="title">开通会员</h1>
     <div class="baseMsg">
-      <h1 class="title">铂仕健身俱乐部VIP会员协议</h1>
       <div class="content">
-        {{txt}}
+        <div class="item-price">
+          <div class="item-label">选择开通年度</div>
+          <div class="item-value">
+            <radio-group class="radio-group" @change="radioChange">
+              <label class="radio" v-for="(item, index) in SectionDiscount" :key="index">
+                <radio :value="[item.year, item.price]" />{{item.year}} 年 - 共 {{item.price}} 元
+              </label>
+            </radio-group>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="isAgree">
-      <radio-group class="radio-group" @change="radioChange">
+    <div class="isAgree" v-if="selectPrice">
+      <radio-group class="radio-group" @change="isAgreed">
         <label class="radio" v-for="item in items" :key="item.name">
-          <radio color="#0299FF" :value="item.value"/> 我已阅读并同意
+          <radio color="#0299FF" :value="item.value"/> 我已同意仕铂健身俱乐部会员协议
         </label>
       </radio-group>
     </div>
     <div class="footer">
       <div class="book pay" >
-        <div class="left"><span>￥<span>{{memberPrice}}</span></span>&nbsp/&nbsp年</div>
+        <div class="left">合计共：&nbsp<span>￥<span>{{selectPrice}}</span></span>&nbsp元</div>
         <div class="right" @click="isAgreeToPay" aria-disabled="true">去支付</div>
       </div>
     </div>
@@ -30,13 +39,14 @@ export default {
   data () {
     return {
       member: [],
+      SectionDiscount: [],
+      selectPrice: '',
+      selectYear: '',
       items: [
         { value: '同意' }
       ],
       isAgree: '同意',
-      selectedAgree: '',
-      memberPrice: '',
-      txt: '腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政腾信息及隐私并选择接受或者不接受本讯游戏用户个人信息及隐私保护政。腾讯在此特别提醒用户仔细阅读本腾讯游戏用户个人信息及隐私保护政策中的各个条款（未成年人应当在其法定监护人陪同下阅读），并选择接受或者不接受本讯游戏用户个人信息及隐私保护政。腾讯在此特别提醒用户仔细阅读本腾讯游戏用户个人信息及隐私保护政策中的各个条款（未成年人应当在其法定监护人陪同下阅读），并选择接受或者不接受本讯游戏用户个人信息及隐私保护政。腾讯在此特别提醒用户仔细阅读本腾讯游戏用户个人信息及隐私保护政策中的各个条款（未成年人应当在其法定监护人陪同下阅读），并选择接受或者不接受本讯游戏用户个人信息及隐私保护政。腾讯在此特别提醒用户仔细阅读本腾讯游戏用户个人信息及隐私保护政策中的各个条款（未成年人应当在其法定监护人陪同下阅读），并选择接受或者不接受本讯游戏用户个人信息及隐私保护政。腾讯在此特别提醒用户仔细阅读本腾讯游戏用户个人信息及隐私保护政策中的各个条款（未成年人应当在其法定监护人陪同下阅读），并选择接受或者不接受本讯游戏用户个人信息及隐私保护政。腾讯在此特别提醒用户仔细阅读本腾讯游戏用户个人信息及隐私保护政策中的各个条款（未成年人应当在其法定监护人陪同下阅读），并选择接受或者不接受本讯游戏用户个人信息及隐私保护政。腾讯在此特别提醒用户仔细阅读本腾讯游戏用户个人信息及隐私保护政策中的各个条款（未成年人应当在其法定监护人陪同下阅读），并选择接受或者不接受本讯游戏用户个人信息及隐私保护政。'
+      selectedAgree: ''
     }
   },
   mounted () {
@@ -52,11 +62,16 @@ export default {
   methods: {
     _getOnly () {
       getOnly().then((res) => {
-        this.memberPrice = res.data.data.memberPrice
+        this.SectionDiscount = res.data.data.cards
       })
     },
     radioChange (e) {
       console.log('radio发生change事件，携带value值为：', e.target.value)
+      this.selectYear = e.target.value.split(',')[0]
+      this.selectPrice = e.target.value.split(',')[1]
+    },
+    isAgreed (e) {
+      console.log('isAgreed', e.target.value)
       this.selectedAgree = e.target.value
     },
     payMethodChange (e) {
@@ -80,7 +95,7 @@ export default {
     },
     goToPay () {
       console.log('...', this.member.openId)
-      payMent(this.member.openId).then((res) => {
+      payMent(this.member.openId, this.selectPrice, this.selectYear).then((res) => {
         console.log('支付', res)
         if (res.data.code === ERR_OK) {
           wx.requestPayment({
@@ -124,20 +139,34 @@ export default {
     background $color-background-d
     width 100%
     height 100vh
+    .title
+      font-size $font-size-large-lg
+      font-weight 900
+      color #000
+      padding px2rem(20) px2rem(60)
+      background #FFFFFF
+      box-shadow 0 px2rem(6) px2rem(26) 0 rgba(0,0,0,0.10)
     .baseMsg
-      height 80vh
-      overflow-y scroll
       padding 0 px2rem(60)
       margin-bottom px2rem(20)
       box-sizing content-box
-      .title
-        text-align center
-        padding px2rem(30) 0
-        font-weight 900
       .content
-        line-height px2rem(36)
-        font-weight 700
-        font-size $font-size-small-s
+        .item-price
+          padding px2rem(40) 0
+          .item-label
+            font-size $font-size-medium-x
+            color #000
+            font-weight 900
+          .item-value
+            padding px2rem(40) 0
+            font-size $font-size-medium-x
+            color $color-text1
+            .radio-group
+              display flex
+              flex-direction column
+              .radio
+                margin px2rem(20) 0
+                flex 1
     .pay-method
       align-items flex-start
       .cell-hb
@@ -148,6 +177,8 @@ export default {
         .radio
           margin px2rem(10) 0
     .isAgree
+      position fixed
+      bottom px2rem(200)
       .radio-group
         padding 0 px2rem(40)
         .radio

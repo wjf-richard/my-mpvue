@@ -12,7 +12,7 @@
       >
         <block v-for="(item, index) in imgUrls" :index="index" :key="key">
           <swiper-item>
-            <a>
+            <a :href="item.url">
               <image :src="item.image" class="slide-image" mode="aspectFill"/>
             </a>
           </swiper-item>
@@ -64,8 +64,8 @@ export default {
   methods: {
     _getOnly () {
       getOnly().then((res) => {
-        this.imgUrls = res.data.data.instructorAdvertisement
-        console.log('教练轮播', this.imgUrls)
+        this.imgUrls = res.data.data.courses
+        console.log('课程轮播', this.imgUrls)
       })
     },
     toHotCourse (courseId) {
@@ -116,7 +116,7 @@ export default {
       padding px2rem(40) px2rem(40) px2rem(40) 0
       display flex
       justify-content space-between
-      border-bottom 1px solid $color-border
+      border-bottom px2rem(1) solid $color-border
       .left
         .course-heads
           height px2rem(80)
@@ -124,7 +124,6 @@ export default {
           border-radius 50%
       .mid
         flex 1
-        margin 0 px2rem(30)
         .mid-content
           display flex
           flex-direction column
