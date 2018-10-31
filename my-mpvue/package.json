@@ -14,6 +14,7 @@
     "flyio": "^0.6.0",
     "mpvue": "^1.0.11",
     "mpvue-router-patch": "^0.2.1",
+    "mpvue-wxparse": "^0.6.5",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

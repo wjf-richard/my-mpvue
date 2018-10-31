@@ -43,6 +43,7 @@ export default {
     return {
       instructorId: '',
       id: '',
+      openId: '',
       startYear: '',
       startTime: '',
       startYearDate: '',
@@ -66,6 +67,7 @@ export default {
   onLoad (options) {
     this.instructorId = options.instructorId
     this.id = options.id
+    this.openId = options.openId
     this._getBookableDate(this.instructorId, this.getToday())
   },
   methods: {
@@ -165,11 +167,17 @@ export default {
     _addInstrtuctorBook () {
       addInstrtuctorBook(this.instructorId, this.id, this.startYearDate).then((res) => {
         console.log(this.instructorId, this.id, this.startYearDate, res)
-        if (res.data.code === ERR_OK) {
+        if (res.data.code === ERR_OK || this.reastNum !== 0) {
           console.log(res)
           this.$tips.alert('预约成功，记得按时来上课哦(*^▽^*)')
           this._getBookableDate(this.instructorId, this.getToday())
           this._getReastTimes(this.instructorId, this.id)
+        } else if (this.reastNum === 0) {
+          let _this = this
+          this.$tips.alert('课程次数已用完，请继续购买！', function () {
+            const url = '/pages/selectCourses/main?instructorId=' + _this.instructorId + '&openId=' + _this.openId + '&id=' + _this.id
+            wx.navigateTo({ url })
+          })
         } else {
           this.$tips.alert('服务器出错，请稍后在预约...')
         }

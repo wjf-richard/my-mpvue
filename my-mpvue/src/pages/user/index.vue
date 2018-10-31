@@ -28,7 +28,7 @@
 
           </div>
         </div>
-        <div class="vip-num" v-else-if="isPaid">
+        <div class="vip-num" v-else-if="type === '年卡'">
             确认中...
         </div>
         <div class="not-vip-num" v-else  @click.stop="toPay()">
@@ -37,28 +37,51 @@
       </div>
     </div>
     <div class="vip-detail-list" v-if="isLogin">
-      <div class="detail-item" v-if="expiryDate != null">
+      <div class="detail-item" v-if="expiryDate != null" @click="toContinueBuy()">
         <div class="type">
           <span class="icon">
-            <img src="http://gcms.qncdn.mygear.vip/deadline.png" alt="">
+            <img src="http://gcms.qncdn.mygear.vip/type@2x.png" alt="">
+          </span>
+          <span class="title">会员类型</span>
+        </div>
+        <div class="content">
+          <span class="integral">{{member.type}}</span>
+          <div class=" right-arrow">
+            <span class="num">
+              <img src="../../common/images/back.png" alt="">
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="detail-item" v-if="expiryDate != null" @click="toContinueBuy()">
+        <div class="type">
+          <span class="icon">
+            <img src="http://gcms.qncdn.mygear.vip/term@2x.png" alt="">
           </span>
           <span class="title">有效期限</span>
         </div>
-        <div class="content"><span class="integral">{{member.expiryDate}}</span></div>
+        <div class="content">
+          <span class="integral">{{member.expiryDate}}</span>
+          <div class=" right-arrow">
+            <span class="num">
+              <img src="../../common/images/back.png" alt="">
+            </span>
+          </div>
+        </div>
       </div>
       <div class="detail-item">
         <div class="type">
           <span class="icon">
-            <img src="http://gcms.qncdn.mygear.vip/vip_integral.png" alt="">
+            <img src="http://gcms.qncdn.mygear.vip/integral@2x.png" alt="">
           </span>
           <span class="title">我的积分</span>
         </div>
         <div class="content"><span class="integral">{{member.credit}}</span></div>
       </div>
-      <!-- <div class="detail-item" @click="toMyBook()">
+      <div class="detail-item" @click="toMyBook()">
         <div class="type">
           <span class="icon">
-            <img src="http://gcms.qncdn.mygear.vip/vip_coach.png" alt="">
+            <img src="http://gcms.qncdn.mygear.vip/order@2x.png" alt="">
           </span>
           <span class="title">我的预约</span>
         </div>
@@ -67,11 +90,24 @@
             <img src="../../common/images/back.png" alt="">
           </span>
         </div>
-      </div> -->
+      </div>
+      <div class="detail-item" @click="toMyMsg()">
+        <div class="type">
+          <span class="icon">
+            <img src="http://gcms.qncdn.mygear.vip/news@2x.png" alt="">
+          </span>
+          <span class="title">我的消息</span>
+        </div>
+        <div class="content right-arrow">
+          <span class="num">
+            <img src="../../common/images/back.png" alt="">
+          </span>
+        </div>
+      </div>
       <!-- <div class="detail-item" @click="toSignIn()">
         <div class="type">
           <span class="icon">
-            <img src="http://gcms.qncdn.mygear.vip/sign.png" alt="">
+            <img src="http://gcms.qncdn.mygear.vip/signIn@2x.png" alt="">
           </span>
           <span class="title">我的签到</span>
         </div>
@@ -100,7 +136,7 @@ export default {
       isLogin: '',
       isData: true,
       isActivated: false,
-      isPaid: false,
+      type: '',
       openId: '',
       id: '',
       member: '',
@@ -117,6 +153,10 @@ export default {
   created () {
     this.getWxLoginResult()
   },
+  onLoad () {
+    // 重置data完成数据初始化
+    Object.assign(this.$data, this.$options.data())
+  },
   methods: {
     toMemberMsg () {
       const url = '/pages/memberMsg/main?openId=' + this.openId
@@ -126,6 +166,10 @@ export default {
       const url = '/pages/updataMemberMsg/main?id=' + this.id
       wx.navigateTo({ url })
     },
+    toContinueBuy () {
+      const url = '/pages/becomeVip/main?id=' + this.id + '&openId=' + this.openId + '&type=' + this.type + '&expiryDate=' + this.expiryDate
+      wx.navigateTo({ url })
+    },
     toPay () {
       const url = '/pages/pay/main?openId=' + this.openId
       wx.navigateTo({ url })
@@ -133,6 +177,12 @@ export default {
     toMyBook () {
       setTimeout(() => {
         const url = '/pages/myBook/main?id=' + this.id
+        wx.navigateTo({ url })
+      }, 17)
+    },
+    toMyMsg () {
+      setTimeout(() => {
+        const url = '/pages/myMessage/main'
         wx.navigateTo({ url })
       }, 17)
     },
@@ -156,7 +206,6 @@ export default {
           console.log('微信登录失败，请检查网络状态')
         },
         complete (res) {
-          // console.log('完成', res)
           if (res.code) {
             wx.request({
               url: 'https://api.gcms.mygear.cn/wechat_login/get_session_info?code=' + res.code,
@@ -165,8 +214,6 @@ export default {
                 'content-type': 'json'
               },
               success: function (res) {
-                console.log('完成后的', res)
-                console.log('完成后的openID', res.data.data.openid)
                 if (res.data.data.openid) {
                   _this._checkMemberIsPay(res.data.data.openid)
                 }
@@ -182,23 +229,19 @@ export default {
       checkMemberIsPay(openId).then((res) => {
         console.log('checkMemberIsPay', res)
         if (res.data.code === 40004) {
-          console.log('空值')
           this.isLogin = false
           this.isNotLogin = true
           this.isData = false
         } else {
-          console.log('是否激活', res.data.data)
-          console.log('isACTIVEEADTED', res.data.data.isActivated)
-          console.log('isPaid', res.data.data.isPaid)
           if (res.data.data.isActivated === true) {
-            this.isPaid = res.data.data.isPaid
+            this.type = res.data.data.type
             this.isActivated = res.data.data.isActivated
-            console.log('true')
             this.isLogin = true
             this.isNotLogin = false
             this._getMemberOpenId(openId)
           } else if (res.data.data.isPaid === true) {
-            this.isPaid = res.data.data.isPaid
+            this.type = res.data.data.type
+            console.log(this.type)
             this.isLogin = true
             this.isNotLogin = false
             this._getMemberOpenId(openId)
@@ -213,16 +256,14 @@ export default {
       })
     },
     _getMemberOpenId (openId) {
-      // console.log(openId)
       getMemberOpenId(openId).then((res) => {
-        console.log('获取openID', res)
         if (res.data.code === ERR_OK) {
           this.id = res.data.data.id
           this.member = res.data.data
           this.expiryDate = res.data.data.expiryDate
           this.isLogin = true
           this.isNotLogin = false
-          console.log('已经登录', res.data.data)
+          console.log('已经登录', this.member)
           this.isData = false
         } else {
           console.log('没有登录')
@@ -360,7 +401,7 @@ export default {
               width 100%
               height 100%
           .title
-            margin-left px2rem(40)
+            margin-left px2rem(20)
             font-size $font-size-medium-x
       .right-arrow
         height px2rem(26)
@@ -368,6 +409,10 @@ export default {
       .content
         font-size $font-size-medium-x
         color #FE335C
+        display flex
+        align-items center
+        .integral
+          margin-right px2rem(10)
         .num
           height 100%
           width 100%

@@ -91,7 +91,7 @@ export default {
     .active-bottom
       position absolute
       bottom 0
-      left 33%
+      left 25%
       width 50%
       height px2rem(8)
       border-radius px2rem(30)

@@ -4,11 +4,10 @@
     <div class="baseMsg">
       <div class="content">
         <div class="item-price">
-          <div class="item-label">选择开通年度</div>
           <div class="item-value">
             <radio-group class="radio-group" @change="radioChange">
               <label class="radio" v-for="(item, index) in SectionDiscount" :key="index">
-                <radio :value="[item.year, item.price]" />{{item.year}} 年 - 共 {{item.price}} 元
+                <radio :value="[item.type, item.price, item.year]" />{{item.name}} - 共 {{item.price}} 元
               </label>
             </radio-group>
           </div>
@@ -40,6 +39,7 @@ export default {
     return {
       member: [],
       SectionDiscount: [],
+      selectType: '',
       selectPrice: '',
       selectYear: '',
       items: [
@@ -62,13 +62,44 @@ export default {
   methods: {
     _getOnly () {
       getOnly().then((res) => {
-        this.SectionDiscount = res.data.data.cards
+        let cards = res.data.data.cards
+        let newCard = []
+        console.log('返回的', res)
+        if (res.data.data.sevenPrice) {
+          console.log(res.data.data.sevenPrice)
+          let sevenObj = {
+            price: res.data.data.sevenPrice,
+            type: 'seven',
+            name: '7天体验卡'
+          }
+          newCard.push(sevenObj)
+        }
+        if (res.data.data.quarterPrice) {
+          console.log(res.data.data.quarterPrice)
+          let quarterObj = {
+            price: res.data.data.quarterPrice,
+            type: 'quarter',
+            name: '季度卡(一个季度)'
+          }
+          newCard.push(quarterObj)
+        }
+        cards.forEach((item, index, arr) => {
+          let newObj = {}
+          newObj.price = arr[index].price
+          newObj.year = arr[index].year
+          newObj.name = arr[index].year + '年卡'
+          newObj.type = 'year'
+          newCard.push(newObj)
+        })
+        this.SectionDiscount = newCard
+        console.log('返回的新数据', newCard)
       })
     },
     radioChange (e) {
       console.log('radio发生change事件，携带value值为：', e.target.value)
-      this.selectYear = e.target.value.split(',')[0]
+      this.selectType = e.target.value.split(',')[0]
       this.selectPrice = e.target.value.split(',')[1]
+      this.selectYear = e.target.value.split(',')[2]
     },
     isAgreed (e) {
       console.log('isAgreed', e.target.value)
@@ -95,7 +126,7 @@ export default {
     },
     goToPay () {
       console.log('...', this.member.openId)
-      payMent(this.member.openId, this.selectPrice, this.selectYear).then((res) => {
+      payMent(this.member.openId, this.selectType, this.selectPrice, this.selectYear).then((res) => {
         console.log('支付', res)
         if (res.data.code === ERR_OK) {
           wx.requestPayment({
@@ -153,10 +184,6 @@ export default {
       .content
         .item-price
           padding px2rem(40) 0
-          .item-label
-            font-size $font-size-medium-x
-            color #000
-            font-weight 900
           .item-value
             padding px2rem(40) 0
             font-size $font-size-medium-x

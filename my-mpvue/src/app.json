@@ -1,15 +1,18 @@
 {
   "pages": [
+    "pages/user/main",
+    "pages/becomeVip/main",
+    "pages/tab/main",
     "pages/index/main",
     "pages/selectCourses/main",
     "pages/myBook/main",
-    "pages/tab/main",
+    "pages/myMessage/main",
+    "base/msgDetail/main",
     "pages/bookInstructor/main",
     "pages/articleDetail/main",
     "pages/pay/main",
     "pages/memberMsg/main",
     "pages/signIn/main",
-    "pages/user/main",
     "pages/updataMemberMsg/main",
     "pages/courseDetail/main",
     "pages/instructorDetail/main"
@@ -25,10 +28,10 @@
     "selectedColor": "#4DBBFD",
     "list": [
       {
-        "pagePath": "pages/index/main", 
+        "pagePath": "pages/tab/main",
         "text": "资讯",
-        "iconPath": "common/images/home.png",
-        "selectedIconPath": "common/images/home@2x.png"
+        "iconPath": "common/images/infor.png",
+        "selectedIconPath": "common/images/infor_click.png"
       },
       {
         "pagePath": "pages/user/main",

@@ -10,13 +10,13 @@
         <view class="section month cell">
           <picker mode="date" 
             fields="month" 
-            @value="date" 
+            @value="initDate" 
             start="2017-01" 
             :end="pickerEnd" 
             @change="bindDateChange"
           >
             <view class="picker">
-              {{date}}
+              {{initDate}}
             </view>
           </picker>
           <span class="arrow-box"><i class="bottom-arrow"></i></span>
@@ -50,7 +50,7 @@ export default {
       yearMonth: '',
       monthList: [],
       pickerEnd: '',
-      date: '2018年09月',
+      initDate: '',
       isData: true
     }
   },
@@ -68,10 +68,12 @@ export default {
     getYearMonth () {
       let myDate = new Date()
       let myMonth = myDate.getMonth() + 1
+      console.log('这个个月', myMonth)
       if (myMonth < 10) {
         myMonth = '0' + myMonth
       }
       let yearMonth = myDate.getFullYear() + '-' + myMonth
+      this.initDate = myDate.getFullYear() + '年' + myMonth + '月'
       return yearMonth
     },
     _signInRecords (id, date) {
@@ -90,11 +92,9 @@ export default {
     bindDateChange (e) {
       let selectDate = e.target.value
       let year = selectDate.substr(0, 4)
-      let month = selectDate.substring(6)
-      if (month < 10) {
-        month = '0' + month
-      }
-      this.date = year + '年' + month + '月'
+      let month = selectDate.substring(5)
+      console.log('月份', selectDate)
+      this.initDate = year + '年' + month + '月'
       this._signInRecords(this.id, selectDate)
       console.log('picker发送选择改变，携带值为', e.target.value)
     },

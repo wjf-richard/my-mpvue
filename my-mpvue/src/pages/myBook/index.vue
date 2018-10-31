@@ -135,7 +135,7 @@ export default {
       box-sizing border-box
       padding px2rem(60) px2rem(60) 0 px2rem(60)
       .date-book-info
-        margin-bottom px2rem(80)
+        margin-bottom px2rem(40)
         .detail-date
           margin-bottom px2rem(20)
           font-size $font-size-medium

@@ -41,8 +41,8 @@ export default {
       isInstructorLoaded: false,
       isCourseLoaded: false,
       tabBar: [
-        { 'title': '教练' },
-        { 'title': '课程' }
+        { 'title': '教练信息' },
+        { 'title': '课程介绍' }
       ],
       tabContent: [
         { 'content': 'instructor'
@@ -120,8 +120,8 @@ export default {
   .active-bottom
     position absolute
     bottom 0
-    left px2rem(4)
-    width px2rem(52)
+    left 25%
+    width 50%
     height px2rem(8)
     border-radius px2rem(30)
     background #2196f3

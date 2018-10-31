@@ -21,7 +21,10 @@
     <tab v-if="tabDeatil" :tabContent="tabDeatil" :tabBar="tabBar"></tab>
     <div class="book" v-if="!isPaid" @click="toPay()">开通VIP会员</div>
     <div class="book" v-else-if="isPaid && !isBought" @click="toBuyCourses()">购买课程</div>
-    <div class="book" v-else-if="isBought" @click="toBookInstructor()">预定课程</div>
+    <div class="book-wrapper" v-else-if="isBought" >
+      <div class="continue-buy" @click="toBuyCourses()">继续购买</div>
+      <div class=" book-course" @click="toBookInstructor()">预约课程</div>
+    </div>
   </div>
 </template>
 
@@ -74,7 +77,7 @@ export default {
       wx.navigateTo({ url })
     },
     toBookInstructor () {
-      const url = '/pages/bookInstructor/main?instructorId=' + this.instructorId + '&id=' + this.id
+      const url = '/pages/bookInstructor/main?instructorId=' + this.instructorId + '&id=' + this.id + '&openId=' + this.openId
       wx.navigateTo({ url })
     },
     _getReastTimes (instructorId, id) {
@@ -96,6 +99,7 @@ export default {
             this._getInstructorsList(this.instructorId, this.id)
             this._getMemberOpenId(openId)
           } else if (res.data.data.isPaid === true) {
+            console.log('剩余次数', res)
             this.isPaid = res.data.data.isPaid
             this.isBought = false
             this._getInstructorsList(this.instructorId, this.id)
@@ -224,6 +228,23 @@ export default {
           height px2rem(80)
           width px2rem(80)
           border-radius 50%
-   
+  .book-wrapper
+    display flex
+    justify-content center
+    align-items center
+    .continue-buy, .book-course
+      display flex
+      cursor pointer
+      justify-content center
+      align-items center
+      margin px2rem(35)
+      height px2rem(80)
+      background linear-gradient(90deg, #00C5FF 0%, #0298FF 100%)
+      color $color-background
+      border-radius px2rem(100)
+      width 100%
+    
+
+
 </style>
 

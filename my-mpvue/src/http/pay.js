@@ -2,8 +2,8 @@ import fly from './api'
 // import qs from 'qs'
 
 // 获取支付接口
-export function payMent (openId, fee, year) {
-  const url = '/wechat_pay/payment?openId=' + openId + '&fee=' + fee + '&year=' + year
+export function payMent (openId, type, fee, year) {
+  const url = '/wechat_pay/payment?openId=' + openId + '&type=' + type + '&fee=' + fee + '&year=' + year
   return fly.request(
     url,
     null,
