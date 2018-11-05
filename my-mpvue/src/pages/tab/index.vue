@@ -13,13 +13,18 @@
       <swiper :current="currentTab" @change="changeTab" >
         <swiper-item class="swiper-item" v-for="(item, index) in tabContent" :key="index" >
           <div class="content" v-if="index === 0">
-            <scroll-view scroll-y style="height: 92vh" >
+            <scroll-view scroll-y style="height: 90vh" >
               <instructor @isLoaded="isInstructorData"></instructor>
             </scroll-view>
           </div>
           <div class="content" v-if="index === 1">
-            <scroll-view scroll-y style="height: 92vh" >
+            <scroll-view scroll-y style="height: 90vh" >
               <course @isLoaded="isCourseData"></course>
+            </scroll-view>
+          </div>
+          <div class="content" v-if="index === 2">
+            <scroll-view scroll-y style="height: 90vh" >
+              <apparatus-des @isLoaded="isCourseData"></apparatus-des>
             </scroll-view>
           </div>
         </swiper-item>
@@ -33,6 +38,7 @@
 import Loading from 'base/loading/loading'
 import instructor from '@/components/instructor'
 import course from '@/components/course'
+import apparatusDes from '@/components/apparatusDes'
 export default {
   data () {
     return {
@@ -42,12 +48,15 @@ export default {
       isCourseLoaded: false,
       tabBar: [
         { 'title': '教练信息' },
-        { 'title': '课程介绍' }
+        { 'title': '课程介绍' },
+        { 'title': '器械介绍' }
       ],
       tabContent: [
         { 'content': 'instructor'
         },
         { 'content': 'course'
+        },
+        { 'content': 'apparatusDes'
         }
       ],
       currentTab: 0
@@ -56,7 +65,8 @@ export default {
   components: {
     Loading,
     instructor,
-    course
+    course,
+    apparatusDes
   },
   mounted () {
     this.isAllDataLoaded()

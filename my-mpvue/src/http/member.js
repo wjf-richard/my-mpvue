@@ -50,3 +50,13 @@ export function checkMemberIsPay (openId) {
     {method: 'get'}
   )
 }
+
+// 根据会员ID获取消息
+export function getMessage (memberId) {
+  const url = '/messages/member?memberId=' + memberId
+  return fly.request(
+    url,
+    null,
+    {method: 'get'}
+  )
+}

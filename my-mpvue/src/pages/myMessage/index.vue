@@ -1,40 +1,19 @@
 <template>
   <div class="container">
     <div class="header">我的消息</div>
-    <div class="content" v-if="isData">
-      <div class="msg-item" @click="toMsgDetail()">
+    <div class="content" v-if="msgList">
+      <div class="msg-item" @click="toMsgDetail()" v-for="(item, index) in msgList" :key="item.updatedAt">
         <div class="left">
           <div class="msg-title">
             <div class="title">
-              <span class="sign system">系统</span>
-              <h4>关于我公司元旦放假时间安排</h4>
+              <span class="sign " :class="[item.type === '公告' ? 'notice' : 'system']">{{item.type}}</span>
+              <h4>{{item.title}}</h4>
             </div>
-            <span class="time">昨天</span>
+            <span class="time">{{item.createdAt}}</span>
           </div>
-          <div class="msg-main">
-            我公司拟定于10月1日到10月7日放假，符合国家我公司拟定于10月1日到10月7日放假，符合国家我公司拟定于10月1日到10月7日放假，符合国家...
-          </div>
+          <div class="msg-main" :class="[item.type === '公告' ? 'msg-system-main' : ' ']">{{item.content}}</div>
         </div>
-        <div class="right right-arrow">
-          <span class="num">
-            <img src="../../common/images/back.png" alt="">
-          </span>
-        </div>
-      </div>
-      <div class="msg-item">
-        <div class="left">
-          <div class="msg-title">
-            <div class="title">
-              <span class="sign notice">公告</span>
-              <h4>林健取消预约</h4>
-            </div>
-            <span class="time">14:28</span>
-          </div>
-          <div class="msg-main">
-            原预约时间 2018-10-28 14:00-15:00
-          </div>
-        </div>
-        <div class="right right-arrow">
+        <div class="right right-arrow" v-show="item.type === '公告'">
           <span class="num">
             <img src="../../common/images/back.png" alt="">
           </span>
@@ -51,15 +30,14 @@
 </template>
 
 <script>
-import {ERR_OK} from '@/http/config'
-import {getMemberBook, isOperate} from '@/http/book'
+// import {ERR_OK} from '@/http/config'
+import {getMessage} from '@/http/member'
+
 export default {
   data () {
     return {
       memberId: '',
-      bookContent: [],
-      instructorBookingId: '',
-      isData: true
+      msgList: []
     }
   },
   onLoad (options) {
@@ -67,78 +45,55 @@ export default {
     console.log('member', this.memberId)
   },
   mounted () {
-    this.bookContent = [ ]
-    this._getMemberBook()
+    this._getMessage()
+    this.getDateStr(-1)
   },
   methods: {
+    _getMessage () {
+      getMessage(this.memberId).then((res) => {
+        this.msgList = res.data.data.content
+        this.getDateDay()
+      })
+    },
     toMsgDetail () {
       const url = '../../base/msgDetail/main'
       wx.navigateTo({ url })
     },
-    _getMemberBook () {
-      getMemberBook(this.memberId).then((res) => {
-        console.log('数据', this.bookContent)
-        let _this = this
-        if (res.data.code === ERR_OK) {
-          console.log('总时间', res.data.data)
-          for (let name in res.data.data) {
-            let detailTime = res.data.data[name]
-            console.log('长度', detailTime)
-            // 获取具体时间，重新截取相应的时间节点
-            for (let i = 0; i < detailTime.length; i++) {
-              let startTime = _this.getDetailTime(detailTime[i].startTime)
-              let endTime = _this.getDetailTime(detailTime[i].endTime)
-              detailTime[i].startTime = startTime
-              detailTime[i].endTime = endTime
-              _this.isData = true
-            }
-            _this.bookContent.push({
-              detailDate: name,
-              detail: res.data.data[name]
-            })
-            console.log('局部', _this.bookContent)
-          }
-        } else {
-          _this.isData = false
-        }
+    getDateDay () {
+      this.msgList.forEach((item, index, arr) => {
+        console.log('值', item)
+        let itemDate = this.isYesterday(item.createdAt)
+        item.createdAt = itemDate
       })
     },
-    cancelBook (index, itemIndex, instructorBookingId) {
-      this.$tips.confirm('确认取消预约么？若确认请您跟教练吱一声哦！').then((res) => {
-        console.log('用户点了 确认')
-        let type = 'cancel'
-        isOperate(this.memberId, instructorBookingId, type).then((res) => {
-          console.log(this.memberId, instructorBookingId, type, res)
-          if (res.data.code === ERR_OK) {
-            Object.assign(this.$data)
-            this.bookContent = [ ]
-            this._getMemberBook()
-          } else {
-            console.log('服务器问题，请稍后在试')
-          }
-        })
-      })
+    getDateStr (dayCount) {
+      if (dayCount === '') {
+        dayCount = 0
+      }
+      let dd = new Date()
+      dd.setDate(dd.getDate() + dayCount) // 设置日期
+      let y = dd.getFullYear()
+      let m = dd.getMonth() + 1
+      let d = dd.getDate()
+      if (d >= 1 && d <= 9) {
+        d = '0' + d
+      }
+      return y + '-' + m + '-' + d
     },
-    finishBook (index, itemIndex, instructorBookingId) {
-      this.$tips.success('很棒！完成了')
-      console.log(index, itemIndex)
-      let type = 'finish'
-      isOperate(this.memberId, instructorBookingId, type).then((res) => {
-        console.log(res)
-        if (res.data.code === ERR_OK) {
-          Object.assign(this.$data)
-          this.bookContent = [ ]
-          this._getMemberBook()
-        } else {
-          console.log('服务器问题，请稍后在试')
-        }
-      })
-    },
-    // 截取字符串方法
-    getDetailTime (str) {
-      let timeArray = str.split(' ')
-      let detailTime = timeArray[1]
-      return detailTime
+    isYesterday (dateStr) {
+      let showDate = ''
+      let _this = this
+      let day = dateStr.substring(0, 10)
+      let time = dateStr.substring(11, 16)
+      if (day === _this.getDateStr(0)) {
+        showDate = time
+      } else if (day === _this.getDateStr(-1)) {
+        showDate = '昨天'
+      } else {
+        showDate = day
+      }
+      console.log(showDate)
+      return showDate
     }
   }
 }
@@ -200,8 +155,12 @@ export default {
             margin-top px2rem(20)
             font-size px2rem(28)
             font-weight 100
+            line-height px2rem(34)
+            letter-spacing px2rem(2)
             color $color-text1
+          .msg-system-main
             no-wrap(1)
+
         .right
           width 5%
         .right-arrow

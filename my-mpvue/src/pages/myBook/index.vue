@@ -137,7 +137,6 @@ export default {
       .date-book-info
         margin-bottom px2rem(40)
         .detail-date
-          margin-bottom px2rem(20)
           font-size $font-size-medium
           color $color-text1
         .book-item

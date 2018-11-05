@@ -1,8 +1,9 @@
 {
   "pages": [
+    "pages/tab/main",
     "pages/user/main",
     "pages/becomeVip/main",
-    "pages/tab/main",
+    "pages/apparatusDetail/main",
     "pages/index/main",
     "pages/selectCourses/main",
     "pages/myBook/main",
@@ -20,7 +21,7 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#F7F7F7",
-    "navigationBarTitleText": "仕铂健身俱乐部",
+    "navigationBarTitleText": "仕铂健身",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {

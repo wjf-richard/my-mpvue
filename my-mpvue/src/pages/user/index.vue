@@ -182,7 +182,7 @@ export default {
     },
     toMyMsg () {
       setTimeout(() => {
-        const url = '/pages/myMessage/main'
+        const url = '/pages/myMessage/main?id=' + this.id
         wx.navigateTo({ url })
       }, 17)
     },
